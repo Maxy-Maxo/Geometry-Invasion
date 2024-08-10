@@ -10,13 +10,13 @@ namespace Geometry_Invasion
     {
         /* targetType
          * 0 = default targeting AI
-         * 1 = homing only, does not change targets
+         * 1 = homing only, does not change targets, unless the target dies and the shape is not a missle
          * 2 = does not target
          * 3 = attatched to target, and when target dies, targetType changes to 0
          */
 
-        public int type, strength, direction, speed, team, reload = 0, shots = 1, reloadTimer, id = -10, target = -1, homing = 0, targetType = 0, segments = 0;
-        public double x, y, health, maxHealth, damage, size;
+        public int type, strength, direction, speed, team, size, reload = 0, shots = 1, reloadTimer, id = -10, target = -1, homing = 0, targetType = 0, segments = 0;
+        public double x, y, health, maxHealth, damage, weight = 1, scoreValue = 1;
         public Enemy(double _x, double _y, int _type, int _strength, int _direction, int _team)
         {
             x = _x;
@@ -63,6 +63,7 @@ namespace Geometry_Invasion
                     damage = 7;
                     size = 27;
                     homing = 1;
+                    scoreValue = 2;
                     break;
                 case 4:
                     maxHealth = 800;
@@ -70,6 +71,7 @@ namespace Geometry_Invasion
                     damage = 15;
                     size = 25;
                     homing = 5;
+                    scoreValue = 1.2;
                     break;
                 case 5:
                     maxHealth = 1500;
@@ -77,6 +79,7 @@ namespace Geometry_Invasion
                     damage = 10;
                     size = 27;
                     homing = 2;
+                    scoreValue = 1.8;
                     break;
                 case 6:
                     maxHealth = 750;
@@ -98,12 +101,14 @@ namespace Geometry_Invasion
                     damage = 5;
                     size = 25;
                     homing = 3;
+                    scoreValue = 0.7;
                     break;
                 case 9:
                     maxHealth = 800;
                     speed = 6;
                     damage = 4;
                     size = 16;
+                    homing = 2;
                     break;
                 case 10:
                     maxHealth = 800;
@@ -137,12 +142,17 @@ namespace Geometry_Invasion
                     targetType = 1;
                     break;
             }
-
+            
             maxHealth *= Math.Pow(1.5, strength);
             damage *= Math.Pow(1.5, strength);
-            size *= Math.Pow(1.1, strength);
+            scoreValue *= Math.Pow(1.5, strength);
             health = maxHealth;
             reloadTimer = reload;
+            if (type >= 100)
+            {
+                scoreValue = 0;
+                weight = 0;
+            }
         }
     }
 }

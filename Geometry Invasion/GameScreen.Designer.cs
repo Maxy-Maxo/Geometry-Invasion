@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.gameTimer = new System.Windows.Forms.Timer(this.components);
+            this.pauseLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // gameTimer
@@ -38,10 +39,23 @@
             this.gameTimer.Interval = 50;
             this.gameTimer.Tick += new System.EventHandler(this.gameTimer_Tick);
             // 
+            // pauseLabel
+            // 
+            this.pauseLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+            this.pauseLabel.ForeColor = System.Drawing.Color.White;
+            this.pauseLabel.Location = new System.Drawing.Point(740, 0);
+            this.pauseLabel.Name = "pauseLabel";
+            this.pauseLabel.Size = new System.Drawing.Size(60, 60);
+            this.pauseLabel.TabIndex = 0;
+            this.pauseLabel.Text = "PAUSE";
+            this.pauseLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.pauseLabel.Click += new System.EventHandler(this.PauseLabel_Click);
+            // 
             // GameScreen
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.Color.Black;
+            this.Controls.Add(this.pauseLabel);
             this.DoubleBuffered = true;
             this.Font = new System.Drawing.Font("VT323", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ForeColor = System.Drawing.Color.White;
@@ -62,5 +76,6 @@
         #endregion
 
         private System.Windows.Forms.Timer gameTimer;
+        private System.Windows.Forms.Label pauseLabel;
     }
 }

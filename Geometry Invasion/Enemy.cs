@@ -37,35 +37,37 @@ namespace Geometry_Invasion
 
             switch (type)
             {
-                case 0:
+                case 0: // Player Circle
                     maxHealth = 1000;
                     speed = 7;
                     damage = 5;
                     size = 25;
                     reload = 10;
                     break;
-                case 1:
+                case 1: // Basic Square
                     maxHealth = 1000;
                     speed = 7;
                     damage = 5;
                     size = 22;
                     break;
-                case 2: 
+                case 2: // Fast Triangle
                     maxHealth = 700;
                     speed = 10;
                     damage = 3;
                     size = 17;
                     homing = 1;
+                    weight = 0.5;
                     break;
-                case 3:
+                case 3: // Heavy Pentagon
                     maxHealth = 2000;
                     speed = 4;
                     damage = 7;
                     size = 27;
                     homing = 1;
                     scoreValue = 2;
+                    weight = 5;
                     break;
-                case 4:
+                case 4: // Dangerous Pentagram
                     maxHealth = 800;
                     speed = 6;
                     damage = 15;
@@ -73,29 +75,31 @@ namespace Geometry_Invasion
                     homing = 5;
                     scoreValue = 1.2;
                     break;
-                case 5:
+                case 5: // Splitting Hexagram
                     maxHealth = 1500;
                     speed = 7;
                     damage = 10;
                     size = 27;
                     homing = 2;
                     scoreValue = 1.8;
+                    weight = 2;
                     break;
-                case 6:
+                case 6: // Split Triangle
                     maxHealth = 750;
                     speed = 7;
                     damage = 10;
                     size = 27;
                     homing = 2;
                     break;
-                case 7:
+                case 7: // Small Shooting Pentagram
                     maxHealth = 700;
                     speed = 4;
                     damage = 2;
                     size = 14;
                     reload = 30;
+                    weight = 0.1;
                     break;
-                case 8:
+                case 8: // Centipede Hexagons
                     maxHealth = 600;
                     speed = 6;
                     damage = 5;
@@ -103,20 +107,31 @@ namespace Geometry_Invasion
                     homing = 3;
                     scoreValue = 0.7;
                     break;
-                case 9:
+                case 9: // Clustered Heptagrams
                     maxHealth = 800;
                     speed = 6;
                     damage = 4;
                     size = 16;
                     homing = 2;
+                    weight = 0.5;
                     break;
-                case 10:
+                case 10: // Quad-Shooting Octogram
                     maxHealth = 800;
                     speed = 4;
                     damage = 6;
                     size = 26;
                     reload = 120;
                     shots = 4;
+                    break;
+                case 11: // Charging Hexagon
+                    maxHealth = 1200;
+                    speed = 4;
+                    damage = 10;
+                    size = 27;
+                    weight = 3;
+                    scoreValue = 1.2;
+                    reload = 120;
+                    shots = 0;
                     break;
                 // missles
                 case 100:
@@ -146,6 +161,7 @@ namespace Geometry_Invasion
             maxHealth *= Math.Pow(1.5, strength);
             damage *= Math.Pow(1.5, strength);
             scoreValue *= Math.Pow(1.5, strength);
+            weight *= Math.Pow(1.5, strength);
             health = maxHealth;
             reloadTimer = reload;
             if (type >= 100)

@@ -15,17 +15,8 @@ namespace Geometry_Invasion
     public partial class GameScreen : UserControl
     {
         bool upKey, downKey, leftKey, rightKey, mouseDown, pauseGame;
-        int wave = -1;
-        double score = 0;
-        double spawnPower;
-        double spawnTime = 50;
-        int enemiesLeft = 0;
-        int enemyTimer = 0;
-        public static int minStrength = 0;
-        int tick = 0;
-        int delayTimer = 0;
-        int gameState = 2;
-        int mouseX, mouseY;
+        int wave, enemiesLeft, enemyTimer, tick, delayTimer, gameState, minStrength, mouseX, mouseY;
+        double score, spawnPower, spawnTime;
         public static int idCounter = 0;
         Random random = new Random();
         Font gameFont = new Font("VT323", 20);
@@ -33,7 +24,9 @@ namespace Geometry_Invasion
 
         List<Enemy> enemies = new List<Enemy>();
         List<Enemy> spawnList = new List<Enemy>();
+        List<Powerup> powerups = new List<Powerup>();
         List<int> typeList = new List<int>();
+        List<int> powerupTimerList = new List<int>();
         int[] typeRarities = { 0, 0, 20, 60, 40, 60, 0, 50, 60, 60, 50, 50 }; // The chance of the type of enemy chosen being rerolled
         SolidBrush playerBrush = new SolidBrush(Color.Blue);
         SolidBrush whiteBrush = new SolidBrush(Color.White);
@@ -43,7 +36,27 @@ namespace Geometry_Invasion
         public GameScreen()
         {
             InitializeComponent();
+            NewGame();
+        }
+
+        private void NewGame() // Reset everything and start a new game
+        {
+            wave = Form1.startingWave - 1;
+            score = 0;
+            enemyTimer = 0;
+            delayTimer = 0;
+            tick = 0;
+            gameState = 2;
+            idCounter = 0;
+            enemies.Clear();
+            spawnList.Clear();
+            powerups.Clear();
+            powerupTimerList.Clear();
             enemies.Add(new Enemy(400, 400, 0, 0, 0, 1));
+            for (int i = 0; i < 6; i++)
+            {
+                powerupTimerList.Add(0);
+            }
         }
 
         private void gameTimer_Tick(object sender, EventArgs e)
@@ -198,6 +211,10 @@ namespace Geometry_Invasion
                             if (en.team == 0)
                             {
                                 score += en.scoreValue;
+                                if (en.type < 100)
+                                {
+                                    powerups.Add(new Powerup(Convert.ToInt16(en.x), Convert.ToInt16(en.y), 0, en.strength));
+                                }
                             }
                             enemies.Remove(en);
                             enemiesLeft = 0;
@@ -214,9 +231,13 @@ namespace Geometry_Invasion
                             }
                             break;
                         }
-                        else
+                        else if (gameState != -1)
                         {
                             gameState = -1;
+                            if (wave > 4 && wave - 4 > Form1.startingWave)
+                            {
+                                Form1.startingWave = wave - 4;
+                            }
                         }
                     }
                     if (en.type == 11 && en.speed > 4)
@@ -234,6 +255,33 @@ namespace Geometry_Invasion
                         }
                     }
                 }
+                foreach (Powerup p in powerups)
+                {
+                    double distHit = enemies[0].size * Math.Pow(1.1, enemies[0].strength) + 20 * Math.Pow(1.1, p.strength);
+                    if (Math.Abs(p.x - enemies[0].x) < distHit && Math.Abs(p.y - enemies[0].y) < distHit)
+                    {
+                        powerupTimerList[p.type] += p.duration[p.type] * Convert.ToInt16(Math.Round(Math.Pow(1.5, p.strength - enemies[0].strength)));
+                        powerups.Remove(p);
+                        break;
+                    }
+                }
+                for (int i = 0; i < powerupTimerList.Count; i++)
+                {
+                    if (powerupTimerList[i] > 0)
+                    {
+                        switch (i)
+                        {
+                            case 0:
+                                enemies[0].health += 8 * Math.Pow(1.5, enemies[0].strength);
+                                if (enemies[0].health > enemies[0].maxHealth)
+                                {
+                                    enemies[0].health = enemies[0].maxHealth;
+                                }
+                                break;
+                        }
+                        powerupTimerList[i]--;
+                    }
+                }
             }
 
             Refresh();
@@ -245,67 +293,84 @@ namespace Geometry_Invasion
             {
                 Alignment = StringAlignment.Center
             };
-            SolidBrush shapeBrush = new SolidBrush(Color.White);
+            SolidBrush shapeBrush = new SolidBrush(Color.FromArgb(50, 50, 50));
+
             foreach (Enemy en in enemies)
             {
                 if (en.health > 0)
                 {
-                    double drawSize = en.size * Math.Pow(1.1, en.strength - minStrength);
+                    int drawSize = Convert.ToInt16(en.size * Math.Pow(1.1, en.strength - minStrength));
+                    if (en.team == 1)
+                    {
+                        shapeBrush.Color = Color.FromArgb(0, 0, 50);
+                    }
+                    else if (en.team == 0)
+                    {
+                        shapeBrush.Color = Color.FromArgb(50, 0, 0);
+                    }
+                    e.Graphics.FillEllipse(shapeBrush, Convert.ToInt16(en.x - drawSize - 5), Convert.ToInt16(en.y - drawSize - 5), drawSize * 2 + 10, drawSize * 2 + 10);
+                }
+            }
+            foreach (Enemy en in enemies)
+            {
+                if (en.health > 0)
+                {
+                    int drawSize = Convert.ToInt16(en.size * Math.Pow(1.1, en.strength - minStrength));
                     switch (en.type)
                     {
                         case 0:
-                            e.Graphics.FillEllipse(playerBrush, Convert.ToInt16(en.x) - Convert.ToInt16(drawSize), Convert.ToInt16(en.y) - Convert.ToInt16(drawSize), Convert.ToInt16(drawSize * 2), Convert.ToInt16(drawSize * 2));
+                            e.Graphics.FillEllipse(playerBrush, Convert.ToInt16(en.x) - drawSize, Convert.ToInt16(en.y) - drawSize, Convert.ToInt16(drawSize * 2), Convert.ToInt16(drawSize * 2));
                             Form1.FillShape(3, 1, Convert.ToInt16(en.x + (10 + drawSize) * Math.Sin(en.direction * Math.PI / 180)), Convert.ToInt16(en.y + (10 + drawSize) * Math.Cos(en.direction * Math.PI / 180)), 8, en.direction, Color.Blue, e);
                             break;
                         case 1:
-                            Form1.FillShape(4, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), Convert.ToInt16(drawSize), en.direction + 45, Color.Goldenrod, e);
+                            Form1.FillShape(4, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction + 45, Color.Goldenrod, e);
                             break;
                         case 2:
-                            Form1.FillShape(3, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), Convert.ToInt16(drawSize), en.direction, Color.Lime, e);
+                            Form1.FillShape(3, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, Color.Lime, e);
                             break;
                         case 3:
-                            Form1.FillShape(5, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), Convert.ToInt16(drawSize), en.direction, Color.Purple, e);
+                            Form1.FillShape(5, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, Color.Purple, e);
                             break;
                         case 4:
-                            Form1.FillShape(5, 2, Convert.ToInt16(en.x), Convert.ToInt16(en.y), Convert.ToInt16(drawSize), en.direction + tick * 10, Color.HotPink, e);
+                            Form1.FillShape(5, 2, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction + tick * 10, Color.HotPink, e);
                             break;
                         case 5:
-                            Form1.FillShape(3, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), Convert.ToInt16(drawSize), en.direction, Color.OrangeRed, e);
-                            Form1.FillShape(3, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), Convert.ToInt16(drawSize), en.direction + 180, Color.OrangeRed, e);
+                            Form1.FillShape(3, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, Color.OrangeRed, e);
+                            Form1.FillShape(3, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction + 180, Color.OrangeRed, e);
                             break;
                         case 6:
-                            Form1.FillShape(3, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), Convert.ToInt16(drawSize), en.direction, Color.OrangeRed, e);
+                            Form1.FillShape(3, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, Color.OrangeRed, e);
                             break;
                         case 7:
-                            Form1.FillShape(5, 2, Convert.ToInt16(en.x), Convert.ToInt16(en.y), Convert.ToInt16(drawSize), en.direction, Color.Yellow, e);
+                            Form1.FillShape(5, 2, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, Color.Yellow, e);
                             break;
                         case 8:
-                            Form1.FillShape(6, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), Convert.ToInt16(drawSize), en.direction, Color.DarkCyan, e);
+                            Form1.FillShape(6, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, Color.DarkCyan, e);
                             shapeBrush.Color = Color.Black;
-                            e.Graphics.FillEllipse(shapeBrush, Convert.ToInt16(en.x) - Convert.ToInt16(drawSize * 0.5), Convert.ToInt16(en.y) - Convert.ToInt16(drawSize * 0.5), Convert.ToInt16(drawSize), Convert.ToInt16(drawSize));
+                            e.Graphics.FillEllipse(shapeBrush, Convert.ToInt16(en.x) - Convert.ToInt16(drawSize * 0.5), Convert.ToInt16(en.y) - Convert.ToInt16(drawSize * 0.5), drawSize, drawSize);
                             break;
                         case 9:
-                            Form1.FillShape(7, 2, Convert.ToInt16(en.x), Convert.ToInt16(en.y), Convert.ToInt16(drawSize), en.direction + tick * 5, Color.BlueViolet, e);
+                            Form1.FillShape(7, 2, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction + tick * 5, Color.BlueViolet, e);
                             Form1.FillShape(7, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), Convert.ToInt16(drawSize * 0.5), en.direction + tick * -5, Color.BlueViolet, e);
                             break;
                         case 10:
-                            Form1.FillShape(8, 3, Convert.ToInt16(en.x), Convert.ToInt16(en.y), Convert.ToInt16(drawSize), en.direction, Color.Magenta, e);
+                            Form1.FillShape(8, 3, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, Color.Magenta, e);
                             break;
                         case 11:
-                            Form1.FillShape(6, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), Convert.ToInt16(drawSize), en.direction, Color.DarkRed, e);
+                            Form1.FillShape(6, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, Color.DarkRed, e);
                             break;
-                        // missles
+                        // missiles
                         case 100:
-                            e.Graphics.FillEllipse(playerBrush, Convert.ToInt16(en.x) - Convert.ToInt16(drawSize), Convert.ToInt16(en.y) - Convert.ToInt16(drawSize), Convert.ToInt16(drawSize * 2), Convert.ToInt16(drawSize * 2));
+                            e.Graphics.FillEllipse(playerBrush, Convert.ToInt16(en.x) - drawSize, Convert.ToInt16(en.y) - drawSize, Convert.ToInt16(drawSize * 2), Convert.ToInt16(drawSize * 2));
                             break;
                         case 107:
                             shapeBrush.Color = Color.Yellow;
                             List<Point> vertices = new List<Point>
-                        {
-                            new Point(Convert.ToInt16(Math.Round(en.x + drawSize * Math.Sin(en.direction * Math.PI / 180))), Convert.ToInt16(Math.Round(en.y + drawSize * Math.Cos(en.direction * Math.PI / 180)))),
-                            new Point(Convert.ToInt16(Math.Round(en.x + drawSize * Math.Sin((en.direction + 144) * Math.PI / 180))), Convert.ToInt16(Math.Round(en.y + drawSize * Math.Cos((en.direction + 144) * Math.PI / 180)))),
-                            new Point(Convert.ToInt16(Math.Round(en.x + drawSize * Math.Sin((en.direction + 216) * Math.PI / 180))), Convert.ToInt16(Math.Round(en.y + drawSize * Math.Cos((en.direction + 216) * Math.PI / 180))))
-                        };
+                            {
+                                new Point(Convert.ToInt16(Math.Round(en.x + drawSize * Math.Sin(en.direction * Math.PI / 180))), Convert.ToInt16(Math.Round(en.y + drawSize * Math.Cos(en.direction * Math.PI / 180)))),
+                                new Point(Convert.ToInt16(Math.Round(en.x + drawSize * Math.Sin((en.direction + 144) * Math.PI / 180))), Convert.ToInt16(Math.Round(en.y + drawSize * Math.Cos((en.direction + 144) * Math.PI / 180)))),
+                                new Point(Convert.ToInt16(Math.Round(en.x + drawSize * Math.Sin((en.direction + 216) * Math.PI / 180))), Convert.ToInt16(Math.Round(en.y + drawSize * Math.Cos((en.direction + 216) * Math.PI / 180))))
+                            };
 
                             Point[] points = vertices.ToArray();
                             e.Graphics.FillPolygon(shapeBrush, points);
@@ -313,11 +378,11 @@ namespace Geometry_Invasion
                         case 110:
                             shapeBrush.Color = Color.Magenta;
                             List<Point> vertices2 = new List<Point>
-                        {
-                            new Point(Convert.ToInt16(Math.Round(en.x + drawSize * Math.Sin(en.direction * Math.PI / 180))), Convert.ToInt16(Math.Round(en.y + drawSize * Math.Cos(en.direction * Math.PI / 180)))),
-                            new Point(Convert.ToInt16(Math.Round(en.x + drawSize * Math.Sin((en.direction + 135) * Math.PI / 180))), Convert.ToInt16(Math.Round(en.y + drawSize * Math.Cos((en.direction + 135) * Math.PI / 180)))),
-                            new Point(Convert.ToInt16(Math.Round(en.x + drawSize * Math.Sin((en.direction + 225) * Math.PI / 180))), Convert.ToInt16(Math.Round(en.y + drawSize * Math.Cos((en.direction + 225) * Math.PI / 180))))
-                        };
+                            {
+                                new Point(Convert.ToInt16(Math.Round(en.x + drawSize * Math.Sin(en.direction * Math.PI / 180))), Convert.ToInt16(Math.Round(en.y + drawSize * Math.Cos(en.direction * Math.PI / 180)))),
+                                new Point(Convert.ToInt16(Math.Round(en.x + drawSize * Math.Sin((en.direction + 135) * Math.PI / 180))), Convert.ToInt16(Math.Round(en.y + drawSize * Math.Cos((en.direction + 135) * Math.PI / 180)))),
+                                new Point(Convert.ToInt16(Math.Round(en.x + drawSize * Math.Sin((en.direction + 225) * Math.PI / 180))), Convert.ToInt16(Math.Round(en.y + drawSize * Math.Cos((en.direction + 225) * Math.PI / 180))))
+                            };
 
                             Point[] points2 = vertices2.ToArray();
                             e.Graphics.FillPolygon(shapeBrush, points2);
@@ -328,7 +393,7 @@ namespace Geometry_Invasion
                     {
                         if (en.targetType != 3)
                         {
-                            e.Graphics.DrawString($"Tier {en.strength + 1}", Font, whiteBrush, Convert.ToInt16(en.x), Convert.ToInt16(en.y + drawSize + 10), stringFormat);
+                            e.Graphics.DrawString($"Lvl {en.strength + 1}", Font, whiteBrush, Convert.ToInt16(en.x), Convert.ToInt16(en.y + drawSize + 10), stringFormat);
                         }
                         if (en.health != en.maxHealth)
                         {
@@ -351,6 +416,11 @@ namespace Geometry_Invasion
                     }
                 }
             }
+            foreach (Powerup p in powerups)
+            {
+                Form1.FillShape(5, 1, p.x, p.y, Convert.ToInt16(20 * Math.Pow(1.1, p.strength)), tick * 5, p.powerupColours[p.type], e);
+                Form1.FillShape(5, 1, p.x, p.y, Convert.ToInt16(20 * Math.Pow(1.1, p.strength)), tick * -5, p.powerupColours[p.type], e);
+            }
             e.Graphics.DrawString($"Wave {wave + 1}", gameFont, whiteBrush, 400, 30, stringFormat);
             e.Graphics.DrawString($"Score: {Math.Round(score * 10) / 10}", gameFontSmall, whiteBrush, 35, 750);
             if (gameState == 2)
@@ -369,12 +439,25 @@ namespace Geometry_Invasion
                 if (pauseGame)
                 {
                     message = "Pause Menu";
+                    button1.Visible = true;
+                    button2.Visible = true;
+                    button1.Text = "RESUME";
+                    button2.Text = "EXIT";
                 }
                 else if (gameState == -1)
                 {
                     message = "Game Over";
+                    button1.Visible = true;
+                    button2.Visible = true;
+                    button1.Text = "PLAY AGAIN";
+                    button2.Text = "EXIT";
                 }
                 e.Graphics.DrawString(message, gameFont, whiteBrush, 400, 220, stringFormat);
+            }
+            else if (button1.Visible)
+            {
+                button1.Visible = false;
+                button2.Visible = false;
             }
         }
 
@@ -425,6 +508,20 @@ namespace Geometry_Invasion
             }
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            pauseGame = false;
+            if (gameState == -1)
+            {
+                NewGame();
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Form1.ChangeScreen(this, new TitleScreen());
+        }
+
         private void GameScreen_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
             switch (e.KeyCode)
@@ -468,7 +565,7 @@ namespace Geometry_Invasion
                     break;
             }
         }
-        private void EnemyAI(Enemy enemy)
+        private void EnemyAI(Enemy enemy) // Any object (except powerups) that isn't a player will do this
         {
             bool collisionPossible = false;
             foreach (Enemy en in enemies)
@@ -523,9 +620,9 @@ namespace Geometry_Invasion
                 FindTarget(enemy);
             }
         }
-        private void CheckCollisions(Enemy en1)
+        private void CheckCollisions(Enemy en1) // Object checks whether it's colliding with another, and then takes damage if the teams don't match
         {
-            if (en1.targetType == 3)
+            if (en1.targetType == 3) // Attatches itself to its target
             {
                 bool collision = false;
                 foreach (Enemy en2 in enemies)
@@ -553,9 +650,9 @@ namespace Geometry_Invasion
                     FindTarget(en1);
                 }
             }
-            foreach (Enemy en2 in enemies)
+            foreach (Enemy en2 in enemies) // Bounces away from the collision
             {
-                if (en1.x != en2.x && en1.y != en2.y && !(en1.type >= 100 || en2.type >= 100 && en1.team == en2.team) && en1.health > 0 && en2.health > 0 && !(en1.type == en2.type && en1.type >= 100) && !((en1.targetType == 3 && en1.target == en2.id) || (en2.targetType == 3 && en2.target == en1.id)) && !(en1.type == 9 && (en1.target == en2.id || en2.target == en1.id)))
+                if (en1.x != en2.x && en1.y != en2.y && !((en1.type >= 100 || en2.type >= 100) && en1.team == en2.team) && en1.health > 0 && en2.health > 0 && !(en1.type == en2.type && en1.type >= 100) && !((en1.targetType == 3 && en1.target == en2.id) || (en2.targetType == 3 && en2.target == en1.id)) && !(en1.type == 9 && (en1.target == en2.id || en2.target == en1.id)))
                 {
                     double distX = Math.Abs(en2.x - en1.x);
                     double distY = Math.Abs(en2.y - en1.y);
@@ -566,7 +663,7 @@ namespace Geometry_Invasion
                         double centreY = (en1.y + en2.y) / 2;
                         double dirHit = Form1.GetDirection(centreX - en1.x, centreY - en1.y);
                         double push = 1;
-                        if (en1.weight != en2.weight)
+                        if (en1.weight != en2.weight) // Calculation for weight ratio
                         {
                             if (en1.weight > en2.weight)
                             {
@@ -599,7 +696,7 @@ namespace Geometry_Invasion
                 en1.y = Math.Sign(en1.y - 400) * 400 + 400;
             }
         }
-        private bool Shoot(Enemy enemy)
+        private bool Shoot(Enemy enemy) // Shape will shoot if it's able to
         {
             bool canShoot = false;
             if (enemy.reload > 0 && enemy.reloadTimer == 0)
@@ -625,7 +722,7 @@ namespace Geometry_Invasion
             }
             return canShoot;
         }
-        private void FindTarget(Enemy enemy)
+        private void FindTarget(Enemy enemy) // Change direction and find the closest enemy if possible
         {
             enemy.target = -1;
             if (enemy.targetType != 1)
@@ -655,7 +752,7 @@ namespace Geometry_Invasion
                 }
             }
         }
-        public void NewWave(int waveNumber)
+        public void NewWave(int waveNumber) // Determines which shapes are available on this wave and randomly selects them based on their rarity
         {
             gameState = 0;
 

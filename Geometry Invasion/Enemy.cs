@@ -10,7 +10,7 @@ namespace Geometry_Invasion
     {
         /* targetType
          * 0 = default targeting AI
-         * 1 = homing only, does not change targets, unless the target dies and the shape is not a missle
+         * 1 = homing only, does not change targets, unless the target dies and the shape is not a missile
          * 2 = does not target
          * 3 = attatched to target, and when target dies, targetType changes to 0
          */
@@ -20,7 +20,7 @@ namespace Geometry_Invasion
         public Enemy(double _x, double _y, int _type, int _strength, int _direction, int _team)
         {
             x = _x;
-            y= _y;
+            y = _y;
             type = _type;
             strength = _strength;
             direction = _direction;
@@ -133,7 +133,7 @@ namespace Geometry_Invasion
                     reload = 120;
                     shots = 0;
                     break;
-                // missles
+                // missiles
                 case 100:
                     maxHealth = 6;
                     speed = 20;
@@ -157,7 +157,7 @@ namespace Geometry_Invasion
                     targetType = 1;
                     break;
             }
-            
+
             maxHealth *= Math.Pow(1.5, strength);
             damage *= Math.Pow(1.5, strength);
             scoreValue *= Math.Pow(1.5, strength);

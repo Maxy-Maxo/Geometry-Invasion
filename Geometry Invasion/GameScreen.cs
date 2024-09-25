@@ -9,12 +9,13 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Geometry_Invasion
 {
     public partial class GameScreen : UserControl
     {
-        bool upKey, downKey, leftKey, rightKey, mouseDown, pauseGame;
+        bool upKey, downKey, leftKey, rightKey, mouseDown, key1, key2, pauseGame;
         int wave, enemiesLeft, enemyTimer, tick, delayTimer, gameState, minStrength, mouseX, mouseY;
         double score, spawnPower, spawnTime;
         public static int idCounter = 0;
@@ -26,13 +27,41 @@ namespace Geometry_Invasion
         List<Enemy> spawnList = new List<Enemy>();
         List<Powerup> powerups = new List<Powerup>();
         List<int> typeList = new List<int>();
-        List<int> powerupTimerList = new List<int>();
+        List<int> powerupCounters = new List<int>();
         int[] typeRarities = { 0, 0, 20, 60, 40, 60, 0, 50, 60, 60, 50, 50 }; // The chance of the type of enemy chosen being rerolled
         SolidBrush playerBrush = new SolidBrush(Color.Blue);
         SolidBrush whiteBrush = new SolidBrush(Color.White);
         SolidBrush greyBrush = new SolidBrush(Color.Gray);
         SolidBrush darkGreyBrush = new SolidBrush(Color.FromArgb(30, 30, 30));
         Pen barPen = new Pen(Color.White);
+
+        Color[] powerupColours =
+        {
+            Color.Violet,
+            Color.IndianRed,
+            Color.Gold,
+            Color.DodgerBlue,
+            Color.Gray,
+            Color.DarkBlue
+        };
+        int[] powerupDuration =
+        {
+            30,
+            150,
+            150,
+            200,
+            3,
+            1
+        };
+        Bitmap[] powerupIcons =
+        {
+            Properties.Resources.health,
+            Properties.Resources.homing,
+            Properties.Resources.up,
+            Properties.Resources.speed,
+            Properties.Resources.mine,
+            Properties.Resources.swap,
+        };
         public GameScreen()
         {
             InitializeComponent();
@@ -51,11 +80,11 @@ namespace Geometry_Invasion
             enemies.Clear();
             spawnList.Clear();
             powerups.Clear();
-            powerupTimerList.Clear();
-            enemies.Add(new Enemy(400, 400, 0, 0, 0, 1));
-            for (int i = 0; i < 6; i++)
+            powerupCounters.Clear();
+            enemies.Add(new Enemy(400, 400, 0, Form1.playerStrength, 0, 1));
+            for (int i = 0; i < powerupDuration.Length; i++)
             {
-                powerupTimerList.Add(0);
+                powerupCounters.Add(0);
             }
         }
 
@@ -63,7 +92,7 @@ namespace Geometry_Invasion
         {
             if (!pauseGame)
             {
-                if (gameState != -1)
+                if (enemies[0].health > 0)
                 {
                     if (upKey != downKey)
                     {
@@ -75,6 +104,10 @@ namespace Geometry_Invasion
                         else
                         {
                             movement = enemies[0].speed;
+                        }
+                        if (powerupCounters[3] > 0)
+                        {
+                            movement *= 1.3;
                         }
                         if (upKey)
                         {
@@ -96,6 +129,10 @@ namespace Geometry_Invasion
                         {
                             movement = enemies[0].speed;
                         }
+                        if (powerupCounters[3] > 0)
+                        {
+                            movement *= 1.3;
+                        }
                         if (leftKey)
                         {
                             enemies[0].x -= movement;
@@ -110,6 +147,14 @@ namespace Geometry_Invasion
                     if (mouseDown)
                     {
                         Shoot(enemies[0]);
+                    }
+                    if (key1)
+                    {
+                        UsePowerup(4, 200);
+                    }
+                    if (key2)
+                    {
+                        UsePowerup(5, 201);
                     }
                 }
 
@@ -201,6 +246,10 @@ namespace Geometry_Invasion
                     }
                     if ((en.type >= 100 && (en.x > 810 || en.x < -10 || en.y > 810 || en.y < -10)) || en.health <= 0)
                     {
+                        if (gameState != -1)
+                        {
+                            FindEnemiesLeft(en.team);
+                        }
                         if (en.id != 0)
                         {
                             if (en.type == 5)
@@ -213,36 +262,20 @@ namespace Geometry_Invasion
                                 score += en.scoreValue;
                                 if (en.type < 100)
                                 {
-                                    powerups.Add(new Powerup(Convert.ToInt16(en.x), Convert.ToInt16(en.y), 0, en.strength));
+                                    powerups.Add(new Powerup(Convert.ToInt16(en.x), Convert.ToInt16(en.y), random.Next(0, powerupColours.Length), en.strength));
                                 }
                             }
                             enemies.Remove(en);
-                            enemiesLeft = 0;
-                            foreach (Enemy en2 in enemies)
-                            {
-                                if (en2.type < 100 && en2.team == 0)
-                                {
-                                    enemiesLeft++;
-                                }
-                            }
-                            if (enemiesLeft == 0 && gameState == 1)
-                            {
-                                gameState = 2;
-                            }
                             break;
-                        }
-                        else if (gameState != -1)
-                        {
-                            gameState = -1;
-                            if (wave > 4 && wave - 4 > Form1.startingWave)
-                            {
-                                Form1.startingWave = wave - 4;
-                            }
                         }
                     }
                     if (en.type == 11 && en.speed > 4)
                     {
                         en.speed--;
+                    }
+                    if (en.team == 1 && en.colour != Color.Blue)
+                    {
+                        en.colour = Color.Blue;
                     }
                 }
                 foreach (Enemy en in enemies)
@@ -260,15 +293,19 @@ namespace Geometry_Invasion
                     double distHit = enemies[0].size * Math.Pow(1.1, enemies[0].strength) + 20 * Math.Pow(1.1, p.strength);
                     if (Math.Abs(p.x - enemies[0].x) < distHit && Math.Abs(p.y - enemies[0].y) < distHit)
                     {
-                        powerupTimerList[p.type] += p.duration[p.type] * Convert.ToInt16(Math.Round(Math.Pow(1.5, p.strength - enemies[0].strength)));
+                        powerupCounters[p.type] += Convert.ToInt16(Math.Round(powerupDuration[p.type] * Math.Pow(1.5, p.strength - enemies[0].strength)));
                         powerups.Remove(p);
                         break;
                     }
                 }
-                for (int i = 0; i < powerupTimerList.Count; i++)
+                for (int i = 0; i < powerupCounters.Count; i++) // Powerup abilities
                 {
-                    if (powerupTimerList[i] > 0)
+                    if (powerupCounters[i] > 0)
                     {
+                        if (!(i == 4 || i == 5))
+                        {
+                            powerupCounters[i]--;
+                        }
                         switch (i)
                         {
                             case 0:
@@ -278,8 +315,29 @@ namespace Geometry_Invasion
                                     enemies[0].health = enemies[0].maxHealth;
                                 }
                                 break;
+                            case 2:
+                                if (enemies[0].strength == Form1.playerStrength)
+                                {
+                                    double healthPercent = enemies[0].health / enemies[0].maxHealth;
+                                    enemies[0].strength++;
+                                    enemies[0].maxHealth = 1000 * Math.Pow(1.5, enemies[0].strength);
+                                    enemies[0].damage = 5 * Math.Pow(1.5, enemies[0].strength);
+                                    enemies[0].scoreValue = Math.Pow(1.5, enemies[0].strength);
+                                    enemies[0].weight = Math.Pow(1.5, enemies[0].strength);
+                                    enemies[0].health = healthPercent * enemies[0].maxHealth;
+                                }
+                                if (powerupCounters[2] == 0)
+                                {
+                                    double healthPercent = enemies[0].health / enemies[0].maxHealth;
+                                    enemies[0].strength = Form1.playerStrength;
+                                    enemies[0].maxHealth = 1000 * Math.Pow(1.5, enemies[0].strength);
+                                    enemies[0].damage = 5 * Math.Pow(1.5, enemies[0].strength);
+                                    enemies[0].scoreValue = Math.Pow(1.5, enemies[0].strength);
+                                    enemies[0].weight = Math.Pow(1.5, enemies[0].strength);
+                                    enemies[0].health = healthPercent * enemies[0].maxHealth;
+                                }
+                                break;
                         }
-                        powerupTimerList[i]--;
                     }
                 }
             }
@@ -316,55 +374,56 @@ namespace Geometry_Invasion
                 if (en.health > 0)
                 {
                     int drawSize = Convert.ToInt16(en.size * Math.Pow(1.1, en.strength - minStrength));
+                    shapeBrush.Color = en.colour;
                     switch (en.type)
                     {
                         case 0:
                             e.Graphics.FillEllipse(playerBrush, Convert.ToInt16(en.x) - drawSize, Convert.ToInt16(en.y) - drawSize, Convert.ToInt16(drawSize * 2), Convert.ToInt16(drawSize * 2));
-                            Form1.FillShape(3, 1, Convert.ToInt16(en.x + (10 + drawSize) * Math.Sin(en.direction * Math.PI / 180)), Convert.ToInt16(en.y + (10 + drawSize) * Math.Cos(en.direction * Math.PI / 180)), 8, en.direction, Color.Blue, e);
+                            Form1.FillShape(3, 1, Convert.ToInt16(en.x + (10 + drawSize) * Math.Sin(en.direction * Math.PI / 180)), Convert.ToInt16(en.y + (10 + drawSize) * Math.Cos(en.direction * Math.PI / 180)), 8, en.direction, en.colour, e);
                             break;
                         case 1:
-                            Form1.FillShape(4, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction + 45, Color.Goldenrod, e);
+                            Form1.FillShape(4, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction + 45, en.colour, e);
                             break;
                         case 2:
-                            Form1.FillShape(3, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, Color.Lime, e);
+                            Form1.FillShape(3, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, en.colour, e);
                             break;
                         case 3:
-                            Form1.FillShape(5, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, Color.Purple, e);
+                            Form1.FillShape(5, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, en.colour, e);
                             break;
                         case 4:
-                            Form1.FillShape(5, 2, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction + tick * 10, Color.HotPink, e);
+                            Form1.FillShape(5, 2, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction + tick * 10, en.colour, e);
                             break;
                         case 5:
-                            Form1.FillShape(3, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, Color.OrangeRed, e);
-                            Form1.FillShape(3, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction + 180, Color.OrangeRed, e);
+                            Form1.FillShape(3, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, en.colour, e);
+                            Form1.FillShape(3, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction + 180, en.colour, e);
                             break;
                         case 6:
-                            Form1.FillShape(3, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, Color.OrangeRed, e);
+                            Form1.FillShape(3, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, en.colour, e);
                             break;
                         case 7:
-                            Form1.FillShape(5, 2, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, Color.Yellow, e);
+                            Form1.FillShape(5, 2, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, en.colour, e);
                             break;
                         case 8:
-                            Form1.FillShape(6, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, Color.DarkCyan, e);
+                            Form1.FillShape(6, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, en.colour, e);
                             shapeBrush.Color = Color.Black;
                             e.Graphics.FillEllipse(shapeBrush, Convert.ToInt16(en.x) - Convert.ToInt16(drawSize * 0.5), Convert.ToInt16(en.y) - Convert.ToInt16(drawSize * 0.5), drawSize, drawSize);
                             break;
                         case 9:
-                            Form1.FillShape(7, 2, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction + tick * 5, Color.BlueViolet, e);
-                            Form1.FillShape(7, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), Convert.ToInt16(drawSize * 0.5), en.direction + tick * -5, Color.BlueViolet, e);
+                            Form1.FillShape(7, 2, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction + tick * 5, en.colour, e);
+                            Form1.FillShape(7, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), Convert.ToInt16(drawSize * 0.5), en.direction + tick * -5, en.colour, e);
                             break;
                         case 10:
-                            Form1.FillShape(8, 3, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, Color.Magenta, e);
+                            Form1.FillShape(8, 3, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, en.colour, e);
                             break;
                         case 11:
-                            Form1.FillShape(6, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, Color.DarkRed, e);
+                            Form1.FillShape(6, 1, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction, en.colour, e);
                             break;
                         // missiles
                         case 100:
                             e.Graphics.FillEllipse(playerBrush, Convert.ToInt16(en.x) - drawSize, Convert.ToInt16(en.y) - drawSize, Convert.ToInt16(drawSize * 2), Convert.ToInt16(drawSize * 2));
                             break;
                         case 107:
-                            shapeBrush.Color = Color.Yellow;
+                            shapeBrush.Color = en.colour;
                             List<Point> vertices = new List<Point>
                             {
                                 new Point(Convert.ToInt16(Math.Round(en.x + drawSize * Math.Sin(en.direction * Math.PI / 180))), Convert.ToInt16(Math.Round(en.y + drawSize * Math.Cos(en.direction * Math.PI / 180)))),
@@ -376,7 +435,7 @@ namespace Geometry_Invasion
                             e.Graphics.FillPolygon(shapeBrush, points);
                             break;
                         case 110:
-                            shapeBrush.Color = Color.Magenta;
+                            shapeBrush.Color = en.colour;
                             List<Point> vertices2 = new List<Point>
                             {
                                 new Point(Convert.ToInt16(Math.Round(en.x + drawSize * Math.Sin(en.direction * Math.PI / 180))), Convert.ToInt16(Math.Round(en.y + drawSize * Math.Cos(en.direction * Math.PI / 180)))),
@@ -386,6 +445,14 @@ namespace Geometry_Invasion
 
                             Point[] points2 = vertices2.ToArray();
                             e.Graphics.FillPolygon(shapeBrush, points2);
+                            break;
+                        // Powerups
+                        case 200:
+                            e.Graphics.FillEllipse(playerBrush, Convert.ToInt16(en.x) - drawSize, Convert.ToInt16(en.y) - drawSize, Convert.ToInt16(drawSize * 2), Convert.ToInt16(drawSize * 2));
+                            Form1.FillShape(8, 3, Convert.ToInt16(en.x), Convert.ToInt16(en.y), Convert.ToInt16(drawSize * 1.3), en.direction, en.colour, e);
+                            break;
+                        case 201:
+                            Form1.FillShape(7, 3, Convert.ToInt16(en.x), Convert.ToInt16(en.y), drawSize, en.direction + tick * 20, en.colour, e);
                             break;
 
                     }
@@ -397,7 +464,17 @@ namespace Geometry_Invasion
                         }
                         if (en.health != en.maxHealth)
                         {
-                            e.Graphics.DrawRectangle(barPen, Convert.ToInt16(en.x - 30), Convert.ToInt16(en.y - drawSize - 20), 60, 4);
+                            if (en.id == 0)
+                            {
+                                if (en.health + 8 * Math.Pow(1.5, en.strength) * powerupCounters[0] < en.maxHealth)
+                                {
+                                    e.Graphics.FillRectangle(greyBrush, Convert.ToInt16(en.x - 30), Convert.ToInt16(en.y - drawSize - 22), Convert.ToInt16(60 * (en.health + 8 * Math.Pow(1.5, en.strength) * powerupCounters[0]) / en.maxHealth), 6);
+                                }
+                                else
+                                {
+                                    e.Graphics.FillRectangle(greyBrush, Convert.ToInt16(en.x - 30), Convert.ToInt16(en.y - drawSize - 22), 60, 6);
+                                }
+                            }
                             SolidBrush healthBrush = new SolidBrush(Color.Red);
                             if (Convert.ToInt16(100 * en.health / en.maxHealth) > 65)
                             {
@@ -411,15 +488,17 @@ namespace Geometry_Invasion
                             {
                                 healthBrush.Color = Color.Orange;
                             }
-                            e.Graphics.FillRectangle(healthBrush, Convert.ToInt16(en.x - 30), Convert.ToInt16(en.y - drawSize - 20), Convert.ToInt16(60 * en.health / en.maxHealth), 4);
+                            e.Graphics.FillRectangle(healthBrush, Convert.ToInt16(en.x - 30), Convert.ToInt16(en.y - drawSize - 22), Convert.ToInt16(60 * en.health / en.maxHealth), 6);
+                            e.Graphics.DrawRectangle(barPen, Convert.ToInt16(en.x - 30), Convert.ToInt16(en.y - drawSize - 22), 60, 6);
                         }
                     }
                 }
             }
             foreach (Powerup p in powerups)
             {
-                Form1.FillShape(5, 1, p.x, p.y, Convert.ToInt16(20 * Math.Pow(1.1, p.strength)), tick * 5, p.powerupColours[p.type], e);
-                Form1.FillShape(5, 1, p.x, p.y, Convert.ToInt16(20 * Math.Pow(1.1, p.strength)), tick * -5, p.powerupColours[p.type], e);
+                Form1.FillShape(5, 1, p.x, p.y, Convert.ToInt16(20 * Math.Pow(1.1, p.strength)), tick * 5, powerupColours[p.type], e);
+                Form1.FillShape(5, 1, p.x, p.y, Convert.ToInt16(20 * Math.Pow(1.1, p.strength)), tick * -5, powerupColours[p.type], e);
+                e.Graphics.DrawImage(powerupIcons[p.type], Convert.ToInt16(p.x - 12 * Math.Pow(1.1, p.strength)), Convert.ToInt16(p.y - 12 * Math.Pow(1.1, p.strength)), Convert.ToInt16(24 * Math.Pow(1.1, p.strength)), Convert.ToInt16(24 * Math.Pow(1.1, p.strength)));
             }
             e.Graphics.DrawString($"Wave {wave + 1}", gameFont, whiteBrush, 400, 30, stringFormat);
             e.Graphics.DrawString($"Score: {Math.Round(score * 10) / 10}", gameFontSmall, whiteBrush, 35, 750);
@@ -430,6 +509,18 @@ namespace Geometry_Invasion
                 e.Graphics.DrawString("Next wave", gameFontSmall, whiteBrush, 400, 75, stringFormat);
             }
             e.Graphics.FillRectangle(darkGreyBrush, 750, 5, 45, 45);
+
+            int x = 0;
+            for (int i = 0; i < powerupCounters.Count; i++)
+            {
+                if (powerupCounters[i] > 0)
+                {
+                    shapeBrush.Color = powerupColours[i];
+                    e.Graphics.FillRectangle(shapeBrush, 35 + 30 * x, 705, 25, 25);
+                    e.Graphics.DrawImage(powerupIcons[i], 35 + 30 * x, 705, 25, 25);
+                    x++;
+                }
+            }
 
             if (pauseGame || gameState == -1)
             {
@@ -493,6 +584,12 @@ namespace Geometry_Invasion
                 case Keys.D:
                     rightKey = false;
                     break;
+                case Keys.D1:
+                    key1 = false;
+                    break;
+                case Keys.D2:
+                    key2 = false;
+                    break;
             }
         }
 
@@ -538,6 +635,12 @@ namespace Geometry_Invasion
                 case Keys.D:
                     rightKey = true;
                     break;
+                case Keys.D1:
+                    key1 = true;
+                    break;
+                case Keys.D2:
+                    key2 = true;
+                    break;
                 case Keys.Space:
                     int rand1 = random.Next(0, 801);
                     int rand2 = random.Next(1, 5);
@@ -561,7 +664,7 @@ namespace Geometry_Invasion
                             ySpawn = rand1;
                             break;
                     }
-                    spawnList.Add(new Enemy(xSpawn, ySpawn, 11, 3, random.Next(0, 360), 1));
+                    spawnList.Add(new Enemy(xSpawn, ySpawn, 9, 2, random.Next(0, 360), 0));
                     break;
             }
         }
@@ -681,8 +784,21 @@ namespace Geometry_Invasion
                         en2.y += (centreY + distHit * Math.Cos(dirHit * Math.PI / 180) / 2 - en2.y) * (2 - push);
                         if (en1.team != en2.team)
                         {
-                            en1.health -= en2.damage;
-                            en2.health -= en1.damage;
+                            if (en1.type != 201)
+                            {
+                                en1.health -= en2.damage;
+                                en2.health -= en1.damage;
+                            }
+                            else
+                            {
+                                if (en1.health > en2.health && enemies[0].health > 0)
+                                {
+                                    ConvertConnected(en2.id, en1.team);
+                                    en2.team = en1.team;
+                                    en1.health -= en2.health;
+                                    FindEnemiesLeft(0);
+                                }
+                            }
                         }
                     }
                 }
@@ -705,6 +821,11 @@ namespace Geometry_Invasion
                 {
                     canShoot = true;
                     enemies.Add(new Enemy(enemy.x, enemy.y, enemy.type + 100, enemy.strength, enemy.direction + (360 * i / enemy.shots), enemy.team));
+                    if (powerupCounters[1] > 0 && enemies[enemies.Count - 1].type == 100)
+                    {
+                        enemies[enemies.Count - 1].targetType = 1;
+                        enemies[enemies.Count - 1].homing = 5;
+                    }
                     if (enemies[enemies.Count - 1].targetType < 2)
                     {
                         FindTarget(enemies[enemies.Count - 1]);
@@ -722,7 +843,7 @@ namespace Geometry_Invasion
             }
             return canShoot;
         }
-        private void FindTarget(Enemy enemy) // Change direction and find the closest enemy if possible
+        void FindTarget(Enemy enemy) // Change direction and find the closest enemy if possible
         {
             enemy.target = -1;
             if (enemy.targetType != 1)
@@ -732,7 +853,7 @@ namespace Geometry_Invasion
             double distance = -1;
             for (int i = 0; i < enemies.Count; i++)
             {
-                if (enemies[i].team != enemy.team && enemies[i].type < 100)
+                if (enemies[i].team != enemy.team && enemies[i].type < 100 && enemies[i].health > 0)
                 {
                     double distX = enemies[i].x - enemy.x;
                     double distY = enemies[i].y - enemy.y;
@@ -752,7 +873,16 @@ namespace Geometry_Invasion
                 }
             }
         }
-        public void NewWave(int waveNumber) // Determines which shapes are available on this wave and randomly selects them based on their rarity
+        void UsePowerup(int pType, int type)
+        {
+            if (enemies[0].reloadTimer == 0 && powerupCounters[pType] > 0)
+            {
+                enemies.Add(new Enemy(enemies[0].x, enemies[0].y, type, enemies[0].strength, enemies[0].direction, enemies[0].team));
+                enemies[0].reloadTimer = enemies[0].reload;
+                powerupCounters[pType]--;
+            }
+        }
+        void NewWave(int waveNumber) // Determines which shapes are available on this wave and randomly selects them based on their rarity
         {
             gameState = 0;
 
@@ -844,6 +974,46 @@ namespace Geometry_Invasion
                 spawnList.Add(new Enemy(xSpawn, ySpawn, chosenType, Convert.ToInt16(enemyStrength), random.Next(0, 360), 0));
             }
             spawnTime = 500 / spawnList.Count;
+        }
+        void FindEnemiesLeft(int team)
+        {
+            if (gameState != -1)
+            {
+                enemiesLeft = 0;
+                foreach (Enemy en in enemies)
+                {
+                    if (en.type < 100 && en.team == team && en.health > 0)
+                    {
+                        enemiesLeft++;
+                    }
+                }
+                if (enemiesLeft == 0 && (gameState == 1 || team == 1))
+                {
+                    if (team == 0)
+                    {
+                        gameState = 2;
+                    }
+                    else
+                    {
+                        gameState = -1;
+                        if (wave > 4 && wave - 4 > Form1.startingWave)
+                        {
+                            Form1.startingWave = wave - 4;
+                        }
+                    }
+                }
+            }
+        }
+        void ConvertConnected(int id, int team)
+        {
+            foreach (Enemy en in enemies)
+            {
+                if (en.target == id && en.team != team)
+                {
+                    ConvertConnected(en.id, team);
+                    en.team = team;
+                }
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace Geometry_Invasion
 {
@@ -17,6 +18,7 @@ namespace Geometry_Invasion
 
         public int type, strength, direction, speed, team, size, reload = 0, shots = 1, reloadTimer, id = -10, target = -1, homing = 0, targetType = 0, segments = 0;
         public double x, y, health, maxHealth, damage, weight = 1, scoreValue = 1;
+        public Color colour = Color.White;
         public Enemy(double _x, double _y, int _type, int _strength, int _direction, int _team)
         {
             x = _x;
@@ -38,6 +40,7 @@ namespace Geometry_Invasion
             switch (type)
             {
                 case 0: // Player Circle
+                    colour = Color.Blue;
                     maxHealth = 1000;
                     speed = 7;
                     damage = 5;
@@ -45,12 +48,14 @@ namespace Geometry_Invasion
                     reload = 10;
                     break;
                 case 1: // Basic Square
+                    colour = Color.Goldenrod;
                     maxHealth = 1000;
                     speed = 7;
                     damage = 5;
                     size = 22;
                     break;
                 case 2: // Fast Triangle
+                    colour = Color.Lime;
                     maxHealth = 700;
                     speed = 10;
                     damage = 3;
@@ -59,6 +64,7 @@ namespace Geometry_Invasion
                     weight = 0.5;
                     break;
                 case 3: // Heavy Pentagon
+                    colour = Color.Purple;
                     maxHealth = 2000;
                     speed = 4;
                     damage = 7;
@@ -68,6 +74,7 @@ namespace Geometry_Invasion
                     weight = 5;
                     break;
                 case 4: // Dangerous Pentagram
+                    colour = Color.HotPink;
                     maxHealth = 800;
                     speed = 6;
                     damage = 15;
@@ -76,6 +83,7 @@ namespace Geometry_Invasion
                     scoreValue = 1.2;
                     break;
                 case 5: // Splitting Hexagram
+                    colour = Color.OrangeRed;
                     maxHealth = 1500;
                     speed = 7;
                     damage = 10;
@@ -85,6 +93,7 @@ namespace Geometry_Invasion
                     weight = 2;
                     break;
                 case 6: // Split Triangle
+                    colour = Color.OrangeRed;
                     maxHealth = 750;
                     speed = 7;
                     damage = 10;
@@ -92,6 +101,7 @@ namespace Geometry_Invasion
                     homing = 2;
                     break;
                 case 7: // Small Shooting Pentagram
+                    colour = Color.Yellow;
                     maxHealth = 700;
                     speed = 4;
                     damage = 2;
@@ -100,6 +110,7 @@ namespace Geometry_Invasion
                     weight = 0.1;
                     break;
                 case 8: // Centipede Hexagons
+                    colour = Color.DarkCyan;
                     maxHealth = 600;
                     speed = 6;
                     damage = 5;
@@ -108,6 +119,7 @@ namespace Geometry_Invasion
                     scoreValue = 0.7;
                     break;
                 case 9: // Clustered Heptagrams
+                    colour = Color.BlueViolet;
                     maxHealth = 800;
                     speed = 6;
                     damage = 4;
@@ -116,6 +128,7 @@ namespace Geometry_Invasion
                     weight = 0.5;
                     break;
                 case 10: // Quad-Shooting Octogram
+                    colour = Color.Magenta;
                     maxHealth = 800;
                     speed = 4;
                     damage = 6;
@@ -124,6 +137,7 @@ namespace Geometry_Invasion
                     shots = 4;
                     break;
                 case 11: // Charging Hexagon
+                    colour = Color.DarkRed;
                     maxHealth = 1200;
                     speed = 4;
                     damage = 10;
@@ -135,6 +149,7 @@ namespace Geometry_Invasion
                     break;
                 // missiles
                 case 100:
+                    colour = Color.Blue;
                     maxHealth = 6;
                     speed = 20;
                     damage = 200;
@@ -142,6 +157,7 @@ namespace Geometry_Invasion
                     targetType = 2;
                     break;
                 case 107:
+                    colour = Color.Yellow;
                     maxHealth = 2;
                     speed = 25;
                     damage = 70;
@@ -149,12 +165,28 @@ namespace Geometry_Invasion
                     targetType = 1;
                     break;
                 case 110:
+                    colour = Color.Magenta;
                     maxHealth = 80;
                     speed = 7;
                     damage = 3;
                     size = 10;
                     homing = 3;
                     targetType = 1;
+                    break;
+                // Powerups
+                case 200:
+                    maxHealth = 1;
+                    speed = 0;
+                    damage = 500;
+                    size = 15;
+                    targetType = 2;
+                    break;
+                case 201:
+                    maxHealth = 3000;
+                    speed = 25;
+                    damage = 0;
+                    size = 10;
+                    targetType = 2;
                     break;
             }
 

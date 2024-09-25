@@ -18,15 +18,6 @@ namespace Geometry_Invasion
          * 5 = switch an enemy's team
          */
         public int x, y, type, strength;
-        public Color[] powerupColours =
-        {
-            Color.Violet,
-            Color.IndianRed
-        };
-        public int[] duration =
-        {
-            30
-        };
         public Powerup(int _x, int _y, int _type, int _strength)
         {
             x = _x;

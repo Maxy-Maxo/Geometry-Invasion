@@ -13,6 +13,7 @@ namespace Geometry_Invasion
     public partial class Form1 : Form
     {
         public static int startingWave = 0;
+        public static int playerStrength = 0;
         public Form1()
         {
             InitializeComponent();

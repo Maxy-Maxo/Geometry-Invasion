@@ -18,7 +18,10 @@ namespace Geometry_Invasion
 
         public int type, strength, direction, speed, team, size, reload = 0, shots = 1, reloadTimer, id = -10, target = -1, homing = 0, targetType = 0, segments = 0;
         public double x, y, health, maxHealth, damage, weight = 1, scoreValue = 1;
+        public bool damageFlash = false;
         public Color colour = Color.White;
+        public int[] drops;
+        public int[] droprates;
         public Enemy(double _x, double _y, int _type, int _strength, int _direction, int _team)
         {
             x = _x;
@@ -40,108 +43,60 @@ namespace Geometry_Invasion
             switch (type)
             {
                 case 0: // Player Circle
-                    colour = Color.Blue;
-                    maxHealth = 1000;
-                    speed = 7;
-                    damage = 5;
-                    size = 25;
+                    SetStats(Color.Blue, 1000, 7, 5, 25);
                     reload = 10;
                     break;
                 case 1: // Basic Square
-                    colour = Color.Goldenrod;
-                    maxHealth = 1000;
-                    speed = 7;
-                    damage = 5;
-                    size = 22;
+                    SetStats(Color.Goldenrod, 1000, 7, 5, 22, new int[] { 0, 2 }, new int[] { 3, 1 });
                     break;
                 case 2: // Fast Triangle
-                    colour = Color.Lime;
-                    maxHealth = 700;
-                    speed = 10;
-                    damage = 3;
-                    size = 17;
+                    SetStats(Color.Lime, 700, 10, 3, 17, new int[] { 3, 1 }, new int[] { 3, 1 });
                     homing = 1;
                     weight = 0.5;
                     break;
                 case 3: // Heavy Pentagon
-                    colour = Color.Purple;
-                    maxHealth = 2000;
-                    speed = 4;
-                    damage = 7;
-                    size = 27;
+                    SetStats(Color.Purple, 2000, 4, 7, 27, new int[] { 0, 2, 7 }, new int[] { 6, 4, 2 });
                     homing = 1;
                     scoreValue = 2;
                     weight = 5;
                     break;
                 case 4: // Dangerous Pentagram
-                    colour = Color.HotPink;
-                    maxHealth = 800;
-                    speed = 6;
-                    damage = 15;
-                    size = 25;
+                    SetStats(Color.HotPink, 800, 6, 15, 25, new int[] { 1, 2, 3 }, new int[] { 5, 2, 2 });
                     homing = 5;
                     scoreValue = 1.2;
                     break;
                 case 5: // Splitting Hexagram
-                    colour = Color.OrangeRed;
-                    maxHealth = 1500;
-                    speed = 7;
-                    damage = 10;
-                    size = 27;
+                    SetStats(Color.OrangeRed, 1500, 7, 10, 27, new int[] { 2, 1, 7, 0 }, new int[] { 5, 3, 3, 2 });
                     homing = 2;
                     scoreValue = 1.8;
                     weight = 2;
                     break;
                 case 6: // Split Triangle
-                    colour = Color.OrangeRed;
-                    maxHealth = 750;
-                    speed = 7;
-                    damage = 10;
-                    size = 27;
+                    SetStats(Color.OrangeRed, 750, 7, 10, 27, new int[] { 4, 1 }, new int[] { 4, 2 });
                     homing = 2;
                     break;
                 case 7: // Small Shooting Pentagram
-                    colour = Color.Yellow;
-                    maxHealth = 700;
-                    speed = 4;
-                    damage = 2;
-                    size = 14;
+                    SetStats(Color.Yellow, 700, 4, 2, 14, new int[] { 6, 1 }, new int[] { 4, 3 });
                     reload = 30;
                     weight = 0.1;
                     break;
                 case 8: // Centipede Hexagons
-                    colour = Color.DarkCyan;
-                    maxHealth = 600;
-                    speed = 6;
-                    damage = 5;
-                    size = 25;
+                    SetStats(Color.DarkCyan, 600, 6, 5, 25, new int[] { 0, 3, 4, 5 }, new int[] { 1, 1, 1, 1 });
                     homing = 3;
                     scoreValue = 0.7;
                     break;
                 case 9: // Clustered Heptagrams
-                    colour = Color.BlueViolet;
-                    maxHealth = 800;
-                    speed = 6;
-                    damage = 4;
-                    size = 16;
+                    SetStats(Color.BlueViolet, 800, 6, 4, 16, new int[] { 5, 6, 3, 4 }, new int[] { 3, 3, 2, 1 });
                     homing = 2;
                     weight = 0.5;
                     break;
                 case 10: // Quad-Shooting Octogram
-                    colour = Color.Magenta;
-                    maxHealth = 800;
-                    speed = 4;
-                    damage = 6;
-                    size = 26;
+                    SetStats(Color.Magenta, 800, 4, 6, 26, new int[] { 6, 1, 4 }, new int[] { 6, 4, 2 });
                     reload = 120;
                     shots = 4;
                     break;
                 case 11: // Charging Hexagon
-                    colour = Color.DarkRed;
-                    maxHealth = 1200;
-                    speed = 4;
-                    damage = 10;
-                    size = 27;
+                    SetStats(Color.DarkRed, 1200, 4, 10, 27, new int[] { 3, 7, 0, 2 }, new int[] { 4, 4, 2, 2 });
                     weight = 3;
                     scoreValue = 1.2;
                     reload = 120;
@@ -149,43 +104,33 @@ namespace Geometry_Invasion
                     break;
                 // missiles
                 case 100:
-                    colour = Color.Blue;
-                    maxHealth = 6;
-                    speed = 20;
-                    damage = 200;
-                    size = 10;
+                    SetStats(6, 20, 200, 10);
                     targetType = 2;
                     break;
                 case 107:
-                    colour = Color.Yellow;
-                    maxHealth = 2;
-                    speed = 25;
-                    damage = 70;
-                    size = 7;
+                    SetStats(2, 25, 70, 7);
                     targetType = 1;
                     break;
                 case 110:
-                    colour = Color.Magenta;
-                    maxHealth = 80;
-                    speed = 7;
-                    damage = 3;
-                    size = 10;
+                    SetStats(80, 7, 3, 10);
                     homing = 3;
                     targetType = 1;
                     break;
                 // Powerups
                 case 200:
-                    maxHealth = 1;
-                    speed = 0;
-                    damage = 500;
-                    size = 15;
+                    SetStats(1, 0, 1000, 15);
                     targetType = 2;
                     break;
                 case 201:
-                    maxHealth = 3000;
-                    speed = 25;
-                    damage = 0;
-                    size = 10;
+                    SetStats(3000, 25, 0, 10);
+                    weight = 0;
+                    targetType = 2;
+                    break;
+                case 202:
+                    SetStats(8000, 4, 4, 50);
+                    homing = 5;
+                    target = 0;
+                    weight = 5;
                     targetType = 2;
                     break;
             }
@@ -196,11 +141,36 @@ namespace Geometry_Invasion
             weight *= Math.Pow(1.5, strength);
             health = maxHealth;
             reloadTimer = reload;
-            if (type >= 100)
+            if (type >= 100 && type < 200)
             {
                 scoreValue = 0;
                 weight = 0;
             }
+        }
+        public void SetStats(Color _colour, int _health, int _speed, int _damage, int _size, int[] _drops, int[] _droprates)
+        {
+            colour = _colour;
+            maxHealth = _health;
+            speed = _speed;
+            damage = _damage;
+            size = _size;
+            drops = _drops;
+            droprates = _droprates;
+        }
+        public void SetStats(Color _colour, int _health, int _speed, int _damage, int _size)
+        {
+            colour = _colour;
+            maxHealth = _health;
+            speed = _speed;
+            damage = _damage;
+            size = _size;
+        }
+        public void SetStats(int _health, int _speed, int _damage, int _size)
+        {
+            maxHealth = _health;
+            speed = _speed;
+            damage = _damage;
+            size = _size;
         }
     }
 }

@@ -14,10 +14,14 @@ namespace Geometry_Invasion
          * 1 = homing missiles
          * 2 = temporary level up
          * 3 = speed boost
-         * 4 = give mines
-         * 5 = switch an enemy's team
+         * 4 = mines
+         * 5 = team switcher
          * 6 = multishot
          * 7 = shield
+         * 8 = fireball
+         * 9 = fast reload
+         * 10 = dash
+         * 11 = resistance
          */
         public int x, y, type, strength;
         public Powerup(int _x, int _y, int _type, int _strength)

@@ -16,9 +16,9 @@ namespace Geometry_Invasion
          * 3 = attatched to target, and when target dies, targetType changes to 0
          */
 
-        public int type, strength, direction, speed, team, size, reload = 0, shots = 1, reloadTimer, id = -10, target = -1, homing = 0, targetType = 0, segments = 0;
+        public int type, strength, resistance = 0, direction, speed, team, size, reload = 0, shots = 1, reloadTimer, bossTimer = 100, id = -10, target = -1, homing = 0, targetType = 0, segments = 0;
         public double x, y, health, maxHealth, damage, weight = 1, scoreValue = 1;
-        public bool damageFlash = false;
+        public bool damageFlash = false, isBoss = false;
         public Color colour = Color.White;
         public int[] drops;
         public int[] droprates;
@@ -40,6 +40,10 @@ namespace Geometry_Invasion
                 }
             }
 
+            ShapeSetup();
+        }
+        public void ShapeSetup()
+        {
             switch (type)
             {
                 case 0: // Player Circle
@@ -47,10 +51,10 @@ namespace Geometry_Invasion
                     reload = 10;
                     break;
                 case 1: // Basic Square
-                    SetStats(Color.Goldenrod, 1000, 7, 5, 22, new int[] { 0, 2 }, new int[] { 3, 1 });
+                    SetStats(Color.Goldenrod, 1000, 7, 5, 22, new int[] { 0, 2 }, new int[] { 3, 3 });
                     break;
                 case 2: // Fast Triangle
-                    SetStats(Color.Lime, 700, 10, 3, 17, new int[] { 3, 1 }, new int[] { 3, 1 });
+                    SetStats(Color.Lime, 700, 10, 3, 17, new int[] { 3, 1, 9, 10 }, new int[] { 3, 1, 1, 1 });
                     homing = 1;
                     weight = 0.5;
                     break;
@@ -61,12 +65,12 @@ namespace Geometry_Invasion
                     weight = 5;
                     break;
                 case 4: // Dangerous Pentagram
-                    SetStats(Color.HotPink, 800, 6, 15, 25, new int[] { 1, 2, 3 }, new int[] { 5, 2, 2 });
+                    SetStats(Color.HotPink, 800, 6, 15, 25, new int[] { 1, 2, 3, 8 }, new int[] { 5, 2, 2, 1 });
                     homing = 5;
                     scoreValue = 1.2;
                     break;
                 case 5: // Splitting Hexagram
-                    SetStats(Color.OrangeRed, 1500, 7, 10, 27, new int[] { 2, 1, 7, 0 }, new int[] { 5, 3, 3, 2 });
+                    SetStats(Color.OrangeRed, 1500, 7, 10, 27, new int[] { 2, 1, 0, 7 }, new int[] { 5, 3, 2, 1 });
                     homing = 2;
                     scoreValue = 1.8;
                     weight = 2;
@@ -76,7 +80,7 @@ namespace Geometry_Invasion
                     homing = 2;
                     break;
                 case 7: // Small Shooting Pentagram
-                    SetStats(Color.Yellow, 700, 4, 2, 14, new int[] { 6, 1 }, new int[] { 4, 3 });
+                    SetStats(Color.Yellow, 700, 4, 2, 14, new int[] { 6, 9, 1 }, new int[] { 4, 4, 3 });
                     reload = 30;
                     weight = 0.1;
                     break;
@@ -91,16 +95,23 @@ namespace Geometry_Invasion
                     weight = 0.5;
                     break;
                 case 10: // Quad-Shooting Octogram
-                    SetStats(Color.Magenta, 800, 4, 6, 26, new int[] { 6, 1, 4 }, new int[] { 6, 4, 2 });
+                    SetStats(Color.Magenta, 800, 4, 6, 26, new int[] { 6, 1, 4, 9 }, new int[] { 6, 4, 2, 1 });
                     reload = 120;
                     shots = 4;
                     break;
                 case 11: // Charging Hexagon
-                    SetStats(Color.DarkRed, 1200, 4, 10, 27, new int[] { 3, 7, 0, 2 }, new int[] { 4, 4, 2, 2 });
+                    SetStats(Color.DarkRed, 1200, 4, 10, 27, new int[] { 10, 7, 0, 2, 8 }, new int[] { 4, 4, 2, 2, 1 });
                     weight = 3;
                     scoreValue = 1.2;
                     reload = 120;
                     shots = 0;
+                    break;
+                case 12: // Resistant Octagon
+                    SetStats(Color.Olive, 400, 8, 2, 20, new int[] { 11, 3, 7, 9 }, new int[] { 4, 3, 1, 1 });
+                    homing = 1;
+                    weight = 0.5;
+                    scoreValue = 1.2;
+                    resistance = 7;
                     break;
                 // missiles
                 case 100:
@@ -116,21 +127,29 @@ namespace Geometry_Invasion
                     homing = 3;
                     targetType = 1;
                     break;
-                // Powerups
-                case 200:
+                // Powerup shapes
+                case 200: // Mine
                     SetStats(1, 0, 1000, 15);
                     targetType = 2;
                     break;
-                case 201:
+                case 201: // Team Switcher
                     SetStats(3000, 25, 0, 10);
                     weight = 0;
                     targetType = 2;
+                    resistance = 10;
                     break;
-                case 202:
-                    SetStats(8000, 4, 4, 50);
+                case 202: // Shield
+                    SetStats(5000, 4, 4, 75);
                     homing = 5;
                     target = 0;
-                    weight = 5;
+                    weight = 10;
+                    resistance = 7;
+                    targetType = 2;
+                    break;
+                case 203: // Fireball
+                    SetStats(1, 15, 100, 35);
+                    weight = 10;
+                    resistance = 10;
                     targetType = 2;
                     break;
             }

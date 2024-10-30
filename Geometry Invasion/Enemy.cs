@@ -17,7 +17,7 @@ namespace Geometry_Invasion
          */
 
         public int type, strength, resistance = 0, direction, speed, team, size, reload = 0, shots = 1, reloadTimer, bossTimer = 100, id = -10, target = -1, homing = 0, targetType = 0, segments = 0;
-        public double x, y, health, maxHealth, damage, weight = 1, scoreValue = 1;
+        public double x, y, health, maxHealth, damage, weight, scoreValue;
         public bool damageFlash = false, isBoss = false;
         public Color colour = Color.White;
         public int[] drops;
@@ -44,6 +44,8 @@ namespace Geometry_Invasion
         }
         public void ShapeSetup()
         {
+            scoreValue = 1;
+            weight = 1;
             switch (type)
             {
                 case 0: // Player Circle
@@ -70,7 +72,7 @@ namespace Geometry_Invasion
                     scoreValue = 1.2;
                     break;
                 case 5: // Splitting Hexagram
-                    SetStats(Color.OrangeRed, 1500, 7, 10, 27, new int[] { 2, 1, 0, 7 }, new int[] { 5, 3, 2, 1 });
+                    SetStats(Color.OrangeRed, 1500, 7, 10, 27, new int[] { 2, 1, 12, 0 }, new int[] { 5, 3, 3, 2 });
                     homing = 2;
                     scoreValue = 1.8;
                     weight = 2;
@@ -90,11 +92,11 @@ namespace Geometry_Invasion
                     scoreValue = 0.7;
                     break;
                 case 9: // Clustered Heptagrams
-                    SetStats(Color.BlueViolet, 800, 6, 4, 16, new int[] { 5, 6, 3, 4 }, new int[] { 3, 3, 2, 1 });
+                    SetStats(Color.BlueViolet, 800, 6, 4, 16, new int[] { 5, 6, 3, 12 }, new int[] { 3, 3, 2, 1 });
                     homing = 2;
                     weight = 0.5;
                     break;
-                case 10: // Quad-Shooting Octogram
+                case 10: // Quad-Shooting Octagram
                     SetStats(Color.Magenta, 800, 4, 6, 26, new int[] { 6, 1, 4, 9 }, new int[] { 6, 4, 2, 1 });
                     reload = 120;
                     shots = 4;
@@ -113,19 +115,35 @@ namespace Geometry_Invasion
                     scoreValue = 1.2;
                     resistance = 7;
                     break;
+                case 13: // Barrier-Placing Square
+                    SetStats(Color.Brown, 800, 7, 3, 30, new int[] { 4, 11, 2, 7 }, new int[] { 4, 2, 1, 1 });
+                    reload = 120;
+                    break;
+                case 14: // Helper Triangle
+                    SetStats(Color.Blue, 1200, 10, 5, 20);
+                    homing = 1;
+                    weight = 0.5;
+                    break;
                 // missiles
-                case 100:
+                case 100: // Player Circle
                     SetStats(6, 20, 200, 10);
                     targetType = 2;
                     break;
-                case 107:
-                    SetStats(2, 25, 70, 7);
+                case 107: // Small Shooting Pentagram
+                    SetStats(1, 25, 60, 7);
                     targetType = 1;
                     break;
-                case 110:
+                case 110: // Quad-Shooting Octagram
                     SetStats(80, 7, 3, 10);
                     homing = 3;
                     targetType = 1;
+                    break;
+                case 113: // Barrier-Placing Square
+                    SetStats(2000, 0, 3, 25);
+                    reload = 600;
+                    shots = 0;
+                    weight = 10;
+                    targetType = 2;
                     break;
                 // Powerup shapes
                 case 200: // Mine
@@ -163,7 +181,10 @@ namespace Geometry_Invasion
             if (type >= 100 && type < 200)
             {
                 scoreValue = 0;
-                weight = 0;
+                if (type != 113)
+                {
+                    weight = 0;
+                }
             }
         }
         public void SetStats(Color _colour, int _health, int _speed, int _damage, int _size, int[] _drops, int[] _droprates)

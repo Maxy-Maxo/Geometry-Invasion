@@ -139,6 +139,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="GeoXML.xml" />
+    <None Include="Resources\spikes.png" />
     <None Include="Resources\triangle.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

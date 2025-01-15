@@ -23,6 +23,7 @@ namespace Geometry_Invasion
          * 10 = dash
          * 11 = resistance
          * 12 = triangle helpers
+         * 13 = spikes
          */
         public int x, y, type, strength, timer;
         public Powerup(int _x, int _y, int _type, int _strength)

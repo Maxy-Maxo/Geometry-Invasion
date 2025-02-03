@@ -139,6 +139,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="GeoXML.xml" />
+    <None Include="Resources\poison.png" />
     <None Include="Resources\spikes.png" />
     <None Include="Resources\triangle.png" />
   </ItemGroup>

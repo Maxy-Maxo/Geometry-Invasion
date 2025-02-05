@@ -22,6 +22,7 @@ namespace Geometry_Invasion
          * 3 = Laser
          * 4 = 2 Dangerous Triangles
          * 5 = 15 Team Switchers
+         * 6 = 3 lower lvl shapes
          */
 
         public int type, strength, resistance, direction, speed, team, size, reload, shots, reloadTimer, id, target, shotBy = -1, homing, targetType, segments = 0, damageFlash = 0;
@@ -87,7 +88,7 @@ namespace Geometry_Invasion
                     weight = 5;
                     break;
                 case 4: // Dangerous Pentagram
-                    SetStats(Color.HotPink, 800, 6, 15, 25, new int[] { 1, 13, 2, 3 }, new int[] { 5, 3, 2, 2 }, new int[] { 0, 2 });
+                    SetStats(Color.HotPink, 800, 6, 15, 25, new int[] { 1, 13, 2, 3 }, new int[] { 5, 3, 2, 2 }, new int[] { 0, 2, 6 });
                     homing = 5;
                     scoreValue = 1.2;
                     break;
@@ -102,7 +103,7 @@ namespace Geometry_Invasion
                     homing = 2;
                     break;
                 case 7: // Small Shooting Pentagram
-                    SetStats(Color.Yellow, 700, 4, 2, 14, new int[] { 9, 1, 6 }, new int[] { 2, 2, 1 }, new int[] { 2, 3 });
+                    SetStats(Color.Yellow, 700, 4, 2, 14, new int[] { 9, 1, 6 }, new int[] { 2, 2, 1 }, new int[] { 0, 2, 3 });
                     reload = 30;
                     weight = 0.1;
                     break;
@@ -112,7 +113,7 @@ namespace Geometry_Invasion
                     scoreValue = 0.6;
                     break;
                 case 9: // Clustered Heptagrams
-                    SetStats(Color.BlueViolet, 800, 6, 4, 16, new int[] { 5, 12 }, new int[] { 3, 1 }, new int[] { 2, 3, 5 });
+                    SetStats(Color.BlueViolet, 800, 6, 4, 16, new int[] { 5, 12 }, new int[] { 3, 1 }, new int[] { 2, 3, 5, 6 });
                     homing = 2;
                     weight = 0.5;
                     scoreValue = 0.8;
@@ -153,26 +154,26 @@ namespace Geometry_Invasion
                     weight = 0.1;
                     break;
                 case 16: // Rare Powerful Decagram
-                    SetStats(Color.White, 3000, 5, 20, 30, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }, new int[] { 1 }, new int[] { 0, 1, 2, 3, 4, 5 });
+                    SetStats(Color.White, 3000, 5, 20, 30, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }, new int[] { 1 }, new int[] { 0, 1, 2, 3, 4, 5, 6 });
                     homing = 5;
                     weight = 5;
                     scoreValue = 5;
                     break;
                 case 17: // Poisonous Heptagram
-                    SetStats(Color.LimeGreen, 800, 6, 5, 22, new int[] { 14, 1 }, new int[] { 3 }, new int[] { 1, 4, 5 });
+                    SetStats(Color.LimeGreen, 800, 6, 5, 22, new int[] { 14, 1 }, new int[] { 3 }, new int[] { 1, 5, 6 });
                     homing = 4;
                     poisonDamage.damage = 0.4;
                     poisonDamage.duration = 50;
                     break;
                 case 18: // Teleporting Pentagon
-                    SetStats(Color.Orange, 500, 9, 5, 20, new int[] { 3, 10 }, new int[] { 2 });
+                    SetStats(Color.Navy, 500, 9, 5, 20, new int[] { 3, 10 }, new int[] { 1, 2, 6 });
                     homing = 2;
                     reload = 80;
                     shots = 0;
                     break;
                 // missiles
                 case 100: // Player Circle
-                    SetStats(6, 20, 200, 10);
+                    SetStats(6, 20, 150, 10);
                     target = -2;
                     break;
                 case 107: // Small Shooting Pentagram
@@ -195,7 +196,7 @@ namespace Geometry_Invasion
                     break;
                 // Powerup shapes
                 case 200: // Mine
-                    SetStats(1, 0, 1000, 15);
+                    SetStats(1, 0, 750, 15);
                     targetType = 2;
                     break;
                 case 201: // Team Switcher
@@ -206,7 +207,7 @@ namespace Geometry_Invasion
                     break;
                 case 202: // Shield
                     SetStats(5000, 4, 4, 75);
-                    homing = 5;
+                    homing = 20;
                     target = 0;
                     weight = 10;
                     resistance = 7;

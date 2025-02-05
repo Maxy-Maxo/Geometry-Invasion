@@ -37,28 +37,28 @@ namespace Geometry_Invasion
         List<int> typeList = new List<int>();
         List<int> powerupCounters = new List<int>();
         List<int> powerupStrengths = new List<int>();
-        int[] typeRarities =
+        int[] typeChance =
         {
             0,
-            10,
             20,
-            60,
-            40,
-            60,
+            17,
+            10,
+            15,
+            6,
             0,
-            50,
-            60,
-            60,
-            50,
-            50,
-            40,
-            50,
-            60,
-            50,
-            90,
-            50,
-            30 
-        }; // The chance of the type of enemy chosen being rerolled
+            10,
+            6,
+            8,
+            10,
+            13,
+            15,
+            8,
+            6,
+            10,
+            2,
+            13,
+            16
+        }; // The likelyhood of the shapes being chosen for the wave
         SolidBrush whiteBrush = new SolidBrush(Color.White);
         SolidBrush greyBrush = new SolidBrush(Color.Gray);
         SolidBrush darkGreyBrush = new SolidBrush(Color.FromArgb(30, 30, 30));
@@ -257,10 +257,6 @@ namespace Geometry_Invasion
 
                 foreach (Enemy en in enemies)
                 {
-                    //if (en.team == 1 && en.colour != Color.Blue)
-                    //{
-                    //    en.colour = Color.Blue;
-                    //}
                     if (en.segments > 0)
                     {
                         if (en.type == 9)
@@ -309,7 +305,7 @@ namespace Geometry_Invasion
                     {
                         if (gameState != -1 && en.type != 5)
                         {
-                            FindEnemiesLeft(en.team);
+                            FindEnemiesLeft(en.team, true);
                         }
                         if (en.id != 0)
                         {
@@ -406,7 +402,7 @@ namespace Geometry_Invasion
                         {
                             break;
                         }
-                        if (en.isBoss && bossTimer > 0 && bossAttack != -1 && en.targetType != 3)
+                        if (en.isBoss && bossTimer > 0 && bossAttack != -1 && en.targetType != 3 && gameState != -1)
                         {
                             if (!timerDecrease)
                             {
@@ -444,13 +440,16 @@ namespace Geometry_Invasion
                             }
                             else
                             {
+                                int spawnDir = random.Next(0, 360);
                                 for (int i = 0; i < 2; i++)
                                 {
-                                    AddShape(enemies[0].x, enemies[0].y, 14, p.strength, random.Next(0, 360), 1);
+                                    Shoot(enemies[0], 14, p.strength);
                                     double distance = Convert.ToInt16(enemies[0].size * Math.Pow(1.1, enemies[0].strength - minStrength)) + Convert.ToInt16(enemies[enemies.Count - 1].size * Math.Pow(1.1, enemies[enemies.Count - 1].strength - minStrength));
+                                    enemies[enemies.Count - 1].direction = spawnDir;
                                     enemies[enemies.Count - 1].x += 2 * distance * Math.Sin(enemies[enemies.Count - 1].direction * Math.PI / 180);
                                     enemies[enemies.Count - 1].y += 2 * distance * Math.Cos(enemies[enemies.Count - 1].direction * Math.PI / 180);
                                     powerupCounters[12]++;
+                                    spawnDir += 180;
                                 }
                             }
                         }
@@ -588,7 +587,7 @@ namespace Geometry_Invasion
                         {
                             if (en.target == en2.id)
                             {
-                                e.Graphics.DrawImage(Properties.Resources.homing, (float)(en2.x - Math.Sin(en2.direction * Math.PI / 180) * (en2.size + en.size + 40)) - 10, (float)(en2.y - Math.Cos(en2.direction * Math.PI / 180) * (en2.size + en.size + 40)) - 10, 20, 20);
+                                e.Graphics.DrawImage(powerupIcons[1], (float)(en2.x - Math.Sin(en2.direction * Math.PI / 180) * (en2.size + en.size + 40)) - 10, (float)(en2.y - Math.Cos(en2.direction * Math.PI / 180) * (en2.size + en.size + 40)) - 10, 20, 20);
                             }
                         }
                     }
@@ -607,7 +606,7 @@ namespace Geometry_Invasion
                         }
                         if (!(en.tp.X == 0 && en.tp.Y == 0) && tick % 2 == 1)
                         {
-                            e.Graphics.DrawImage(Properties.Resources.homing, en.tp.X - 10, en.tp.Y - 10, 20, 20);
+                            e.Graphics.DrawImage(powerupIcons[1], en.tp.X - 10, en.tp.Y - 10, 20, 20);
                         }
                     }
                 }
@@ -617,7 +616,7 @@ namespace Geometry_Invasion
                     {
                         if (tick % 2 == 1)
                         {
-                            e.Graphics.DrawImage(Properties.Resources.homing, en.tp.X - 10, en.tp.Y - 10, 20, 20);
+                            e.Graphics.DrawImage(powerupIcons[1], en.tp.X - 10, en.tp.Y - 10, 20, 20);
                         }
                         Pen connectPen = new Pen(Color.FromArgb(30, 30, 30), 2);
                         e.Graphics.DrawLine(connectPen, (float)en.x, (float)en.y, en.tp.X, en.tp.Y);
@@ -1108,7 +1107,7 @@ namespace Geometry_Invasion
                     }
                 }
             }
-            if (tick % 60 == 0 && random.Next(0, 2) == 1 || enemy.x > 790 || enemy.x < 10 || enemy.y > 790 || enemy.y < 10)
+            if ((tick % 60 == 0 && random.Next(0, 2) == 1 || enemy.x > 790 || enemy.x < 10 || enemy.y > 790 || enemy.y < 10) && enemy.type < 100)
             {
                 FindTarget(enemy);
             }
@@ -1178,7 +1177,7 @@ namespace Geometry_Invasion
                             {
                                 int rand1 = random.Next(1, 11);
                                 int rand2 = random.Next(1, 11);
-                                if (rand1 > en1.resistance && en1.damageFlash < 2)
+                                if (rand1 > en1.resistance)
                                 {
                                     en1.health -= en2.damage;
                                     en1.damageFlash = 2;
@@ -1187,7 +1186,7 @@ namespace Geometry_Invasion
                                         en1.poisonTaken.Add(en2.poisonDamage);
                                     }
                                 }
-                                if (rand2 > en2.resistance && en2.damageFlash < 2)
+                                if (rand2 > en2.resistance)
                                 {
                                     en2.health -= en1.damage;
                                     en2.damageFlash = 2;
@@ -1204,7 +1203,7 @@ namespace Geometry_Invasion
                                     ConvertConnected(en2.id, en1.team);
                                     en2.team = en1.team;
                                     en1.health -= en2.health;
-                                    FindEnemiesLeft(0);
+                                    FindEnemiesLeft(0, true);
                                 }
                             }
                         }
@@ -1367,7 +1366,8 @@ namespace Geometry_Invasion
             AddListShape(new int[] { 4, 7, 11 }, 5, waveNumber);
             AddListShape(new int[] { 5, 14, 15 }, 6, waveNumber);
             AddListShape(new int[] { 8, 9 }, 7, waveNumber);
-            AddListShape(12, 9, waveNumber);
+            AddListShape(new int[] { 17, 18 }, 8, waveNumber);
+            AddListShape(new int[] { 12, 16 }, 9, waveNumber);
             AddListShape(new int[] { 10, 13 }, 11, waveNumber);
 
             if (wave >= 6)
@@ -1376,6 +1376,14 @@ namespace Geometry_Invasion
             }
 
             spawnPower = 10 * Math.Pow(1.2, waveNumber);
+            List<int> possibleShapes = new List<int>();
+            foreach (int type in typeList)
+            {
+                for (int i = 0; i < typeChance[type]; i++)
+                {
+                    possibleShapes.Add(type);
+                }
+            }
             while (spawnPower > 0)
             {
                 double enemyStrength = Math.Floor(Convert.ToDouble(waveNumber / 3));
@@ -1420,13 +1428,7 @@ namespace Geometry_Invasion
                         ySpawn = rand1;
                         break;
                 }
-                int chosenType = typeList[random.Next(0, typeList.Count)];
-                rand1 = random.Next(0, 101);
-                while (rand1 < typeRarities[chosenType])
-                {
-                    chosenType = typeList[random.Next(0, typeList.Count)];
-                    rand1 = random.Next(0, 101);
-                }
+                int chosenType = possibleShapes[random.Next(0, possibleShapes.Count)];
                 spawnList.Add(new Enemy(xSpawn, ySpawn, chosenType, Convert.ToInt16(enemyStrength), random.Next(0, 360), 0));
             }
             spawnTime = 500 / spawnList.Count;
@@ -1459,14 +1461,14 @@ namespace Geometry_Invasion
                 }
             }
         }
-        void FindEnemiesLeft(int team) // Find the amount of shapes left on a certain team, if there are none on the team, either game over or wave complete
+        void FindEnemiesLeft(int team, bool shapesOnly) // Find the amount of shapes left on a certain team, if there are none on the team, either game over or wave complete
         {
             if (gameState != -1)
             {
                 enemiesLeft = 0;
                 foreach (Enemy en in enemies)
                 {
-                    if (en.type < 100 && en.team == team && en.health > 0)
+                    if ((en.type < 100 || !shapesOnly) && en.team == team && en.health > 0)
                     {
                         enemiesLeft++;
                     }
@@ -1541,11 +1543,11 @@ namespace Geometry_Invasion
         }
         void SpecialAttack(Enemy enemy)
         {
-            bossTimer = 10;
+            bossTimer = 100;
             switch (bossAttack)
             {
                 case 0: // 5 Fast Triangles
-                    FindEnemiesLeft(enemy.team);
+                    FindEnemiesLeft(enemy.team, true);
                     if (enemiesLeft < 7)
                     {
                         for (int i = 0; i < 5; i++)
@@ -1579,7 +1581,7 @@ namespace Geometry_Invasion
                     bossTimer = 100;
                     break;
                 case 4: // 2 Dangerous Triangles
-                    FindEnemiesLeft(enemy.team);
+                    FindEnemiesLeft(enemy.team, true);
                     if (enemiesLeft < 7)
                     {
                         for (int i = 0; i < 2; i++)
@@ -1590,7 +1592,7 @@ namespace Geometry_Invasion
                     }
                     break;
                 case 5: // 15 Team Switchers
-                    FindEnemiesLeft(1);
+                    FindEnemiesLeft(1, false);
                     if (enemiesLeft > 1)
                     {
                         for (int i = 0; i < 15; i++)
@@ -1599,6 +1601,17 @@ namespace Geometry_Invasion
                             Shoot(enemy, 201, enemy.strength - 3);
                         }
                         bossTimer = 100;
+                    }
+                    break;
+                case 6: // 3 lower lvl shapes
+                    FindEnemiesLeft(enemy.team, true);
+                    if (enemiesLeft < 7)
+                    {
+                        for (int i = 0; i < 3; i++)
+                        {
+                            Shoot(enemy, enemy.type, enemy.strength - 5);
+                        }
+                        bossTimer = 250;
                     }
                     break;
 
@@ -1631,6 +1644,7 @@ namespace Geometry_Invasion
                     CheckCollisions(en);
                 }
             }
+            FindEnemiesLeft(team, true);
         }
     }
 }

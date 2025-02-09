@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
 
 namespace Geometry_Invasion
 {
@@ -11,7 +6,7 @@ namespace Geometry_Invasion
     {
         /* type
          * 0 = instant health
-         * 1 = homing missiles
+         * 1 = homing bullets
          * 2 = temporary level up
          * 3 = speed boost
          * 4 = mines
@@ -24,7 +19,7 @@ namespace Geometry_Invasion
          * 11 = resistance
          * 12 = triangle helpers
          * 13 = spikes
-         * 14 = poisonous missiles
+         * 14 = poisonous bullets
          */
         public int x, y, type, strength, timer;
         public Powerup(int _x, int _y, int _type, int _strength)

@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Geometry_Invasion
@@ -13,7 +8,7 @@ namespace Geometry_Invasion
     public partial class Form1 : Form
     {
         public static int startingWave = 0;
-        public static int playerStrength = 1;
+        public static int playerStrength = 0;
         public Form1()
         {
             InitializeComponent();
@@ -43,72 +38,58 @@ namespace Geometry_Invasion
         public static void FillShape(int sides, int level, int x, int y, int size, int rotation, Color colour, PaintEventArgs e)
         {
             SolidBrush brush = new SolidBrush(colour);
-            double counter = rotation;
-
-            List<Point> vertices = new List<Point>();
-            for (int i = 0; i < sides; i++)
+            if (sides > 2) // Less than 3 sides makes a circle
             {
-                vertices.Add(new Point(Convert.ToInt16(Math.Round(x + size * Math.Sin(counter * Math.PI / 180))), Convert.ToInt16(Math.Round(y + size * Math.Cos(counter * Math.PI / 180)))));
-                counter += 3600 * level / sides / 10;
-            }
-            Point[] points = vertices.ToArray();
-            e.Graphics.FillPolygon(brush, points);
-        }
-        public static double GetDirection(int xSpeed, int ySpeed)
-        {
-            double direction;
+                double counter = rotation;
 
-            if (ySpeed == 0)
-            {
-                if (xSpeed < 0)
+                List<Point> vertices = new List<Point>();
+                for (int i = 0; i < sides; i++)
                 {
-                    return -90;
+                    vertices.Add(new Point(Convert.ToInt16(Math.Round(x + size * Math.Sin(counter * Math.PI / 180))), Convert.ToInt16(Math.Round(y + size * Math.Cos(counter * Math.PI / 180)))));
+                    counter += 3600 * level / sides / 10;
+                }
+                Point[] points = vertices.ToArray();
+                e.Graphics.FillPolygon(brush, points);
+            }
+            else
+            {
+                e.Graphics.FillEllipse(brush, x - size, y - size, size * 2, size * 2);
+            }
+        }
+        public static float GetDirection(double x, double y)
+        {
+            float direction;
+
+            if (y == 0)
+            {
+                if (x < 0)
+                {
+                    direction = 270;
                 }
                 else
                 {
-                    return 90;
+                    direction = 90;
                 }
             }
             else
             {
-                direction = Math.Atan2(xSpeed, ySpeed) * 180 / Math.PI;
-
-                if (xSpeed <= 0 && ySpeed > 0)
-                {
-                    direction += 360;
-                }
-
-                return direction;
+                direction = (float)(Math.Atan2(x, y) * 180 / Math.PI);
             }
-
+            return (direction + 360) % 360;
         }
-        public static double GetDirection(double xSpeed, double ySpeed)
+        public static int Flip(double direction, string axis)
         {
-            double direction;
-
-            if (ySpeed == 0)
+            float x = (float)Math.Sin(direction * Math.PI / 180);
+            float y = (float)Math.Cos(direction * Math.PI / 180);
+            switch (axis)
             {
-                if (xSpeed < 0)
-                {
-                    return -90;
-                }
-                else
-                {
-                    return 90;
-                }
+                case "x":
+                    return (int)Math.Round(GetDirection(x, y * -1));
+                case "y":
+                    return (int)Math.Round(GetDirection(x * -1, y));
+                default:
+                    return -1;
             }
-            else
-            {
-                direction = Math.Atan2(xSpeed, ySpeed) * 180 / Math.PI;
-
-                if (xSpeed <= 0 && ySpeed > 0)
-                {
-                    direction += 360;
-                }
-
-                return direction;
-            }
-
         }
     }
 }

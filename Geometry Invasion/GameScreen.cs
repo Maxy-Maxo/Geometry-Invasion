@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
@@ -25,9 +26,9 @@ namespace Geometry_Invasion
         List<Enemy> spawnList = new List<Enemy>();
         List<Powerup> powerups = new List<Powerup>();
         List<int> typeList = new List<int>();
-        List<int> powerupCounters = new List<int>();
         List<int> powerupStrengths = new List<int>();
         Bitmap crown = Properties.Resources.boss;
+
         int[] typeChance =
         {
             0,
@@ -87,6 +88,7 @@ namespace Geometry_Invasion
             200,
             150
         }; // The duration can mean the amount of time or uses of the powerup, or it is zero if it is an instant powerup.
+        int[] powerupCounters = new int[15];
         Bitmap[] powerupIcons =
         {
             Properties.Resources.health,
@@ -477,7 +479,7 @@ namespace Geometry_Invasion
                         break;
                     }
                 }
-                for (int i = 0; i < powerupCounters.Count; i++) // Powerup abilities
+                for (int i = 0; i < powerupCounters.Length; i++) // Powerup abilities
                 {
                     if (powerupCounters[i] > 0 && gameState != 2 && enemies[0].health > 0)
                     {
@@ -806,7 +808,15 @@ namespace Geometry_Invasion
             }
             string waveMsg = (gameState == 2) ? ((wave + 1 == Form1.startingWave) ? $"Starting at Wave {wave + 2}..." : "Wave Complete") : $"Wave {wave + 1}";
             e.Graphics.DrawString(waveMsg, gameFont, whiteBrush, 400, 30, stringFormat); // Wave display
-            e.Graphics.DrawString($"Score: {Math.Round(score * 10) / 10}", gameFontSmall, whiteBrush, 35, 755); // Score display
+            if (gameState != -1)
+            {
+                e.Graphics.DrawString($"Score: {Math.Round(score * 10) / 10}", gameFontSmall, whiteBrush, 35, 755); // Score display
+            }
+            else
+            {
+                e.Graphics.DrawString($"Points Earned: {Math.Round(score)}", gameFontSmall, whiteBrush, 35, 735); // Points display
+                e.Graphics.DrawString($"Total Points: {Form1.points}", gameFontSmall, whiteBrush, 35, 755);
+            }
             if (gameState == 2) // Wave countdown bar
             {
                 e.Graphics.DrawRectangle(barPen, 350, 70, 100, 30);
@@ -822,7 +832,7 @@ namespace Geometry_Invasion
             e.Graphics.FillRectangle(darkGreyBrush, 750, 5, 45, 45);
 
             int x = 0;
-            for (int i = 0; i < powerupCounters.Count; i++) // Powerup HUD
+            for (int i = 0; i < powerupCounters.Length; i++) // Powerup HUD
             {
                 if (powerupCounters[i] > 0)
                 {
@@ -997,7 +1007,7 @@ namespace Geometry_Invasion
                     spawnList.Add(new Enemy(xSpawn, ySpawn, 7, 0, random.Next(0, 360), 0));
                     break;
                 case Keys.D1:
-                    powerups.Add(new Powerup(Convert.ToInt16(enemies[0].x), Convert.ToInt16(enemies[0].y), 5, 6));
+                    powerups.Add(new Powerup(Convert.ToInt16(enemies[0].x), Convert.ToInt16(enemies[0].y), 2, 6));
                     break;
             }
         }
@@ -1022,9 +1032,6 @@ namespace Geometry_Invasion
         }
         private void button2_Click(object sender, EventArgs e)
         {
-            // Save data to XML file
-            //XmlWriter writer = XmlWriter.Create("GeoXML.xml");
-
             Form1.ChangeScreen(this, new TitleScreen());
         }
         private void NewGame() // Reset everything and start a new game
@@ -1039,11 +1046,10 @@ namespace Geometry_Invasion
             enemies.Clear();
             spawnList.Clear();
             powerups.Clear();
-            powerupCounters.Clear();
+            ResetCounters();
             AddShape(400, 400, 0, Form1.playerStrength, 0, 1);
             for (int i = 0; i < powerupDuration.Length; i++)
             {
-                powerupCounters.Add(0);
                 powerupStrengths.Add(0);
             }
         }
@@ -1466,6 +1472,8 @@ namespace Geometry_Invasion
                     else if (gameState != 2)
                     {
                         gameState = -1;
+                        Form1.points += (int)Math.Round(score);
+                        ResetCounters();
                         foreach (Enemy en in enemies)
                         {
                             if (en.team == 1)
@@ -1631,6 +1639,13 @@ namespace Geometry_Invasion
                 }
             }
             FindEnemiesLeft(team, true);
+        }
+        void ResetCounters()
+        {
+            for (int i = 0; i < powerupCounters.Length; i++)
+            {
+                powerupCounters[i] = 0;
+            }
         }
         void Swap(object[] array) // Swaps two random items in an object array
         {

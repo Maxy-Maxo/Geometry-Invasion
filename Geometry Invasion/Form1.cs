@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 
 namespace Geometry_Invasion
@@ -9,10 +10,13 @@ namespace Geometry_Invasion
     {
         public static int startingWave = 0;
         public static int playerStrength = 0;
+        public static int points = 0;
         public Form1()
         {
             InitializeComponent();
+            RetrieveData();
             ChangeScreen(this, new TitleScreen());
+
         }
         public static void ChangeScreen(object sender, UserControl next)
         {
@@ -90,6 +94,33 @@ namespace Geometry_Invasion
                 default:
                     return -1;
             }
+        }
+        public static void SaveData()
+        {
+            FileStream file;
+            StreamWriter writer;
+            file = File.OpenWrite("..\\..\\Resources\\save.txt");
+            writer = new StreamWriter(file);
+            writer.Write($"{startingWave}|{playerStrength}|{points}");
+            writer.Close();
+            file.Close();
+        }
+        public void RetrieveData()
+        {
+            FileStream file;
+            StreamReader reader;
+            file = File.OpenRead("..\\..\\Resources\\save.txt");
+            reader = new StreamReader(file);
+            string str = reader.ReadLine();
+            if (str != null)
+            {
+                string[] saveInfo = str.Split('|');
+                startingWave = int.Parse(saveInfo[0]);
+                playerStrength = int.Parse(saveInfo[1]);
+                points = int.Parse(saveInfo[2]);
+            }
+            reader.Close();
+            file.Close();
         }
     }
 }

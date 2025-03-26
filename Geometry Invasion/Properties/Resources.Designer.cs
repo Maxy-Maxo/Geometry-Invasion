@@ -133,6 +133,16 @@ namespace Geometry_Invasion.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap phase {
+            get {
+                object obj = ResourceManager.GetObject("phase", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap poison {
             get {
                 object obj = ResourceManager.GetObject("poison", resourceCulture);
@@ -161,7 +171,12 @@ namespace Geometry_Invasion.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to 6|0|2934
+        ///0|0|0
+        ///0|0|0
+        ///0|0|0
+        ///0|0|0
+        ///0.
         /// </summary>
         internal static string save {
             get {

@@ -28,5 +28,10 @@ namespace Geometry_Invasion
             Form1.SaveData();
             Application.Exit();
         }
+
+        private void upgradesButton_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

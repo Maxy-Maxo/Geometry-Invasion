@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Microsoft.Win32.SafeHandles;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -27,8 +30,15 @@ namespace Geometry_Invasion
         List<Powerup> powerups = new List<Powerup>();
         List<int> typeList = new List<int>();
         List<int> powerupStrengths = new List<int>();
+        List<Button> currentButtons = new List<Button>();
         Bitmap crown = Properties.Resources.boss;
 
+        Button[] buttons =
+        {
+            new Button("RESUME", 0, 400, 350, 250, 85, Color.Black),
+            new Button("PLAY AGAIN", 1, 400, 350, 250, 85, Color.Black),
+            new Button("EXIT", 2, 400, 450, 250, 85, Color.Red)
+        }; // Every possible button
         int[] typeChance =
         {
             0,
@@ -49,7 +59,8 @@ namespace Geometry_Invasion
             10,
             2,
             13,
-            16
+            16,
+            15
         }; // The likelyhood of the shapes being chosen for the wave
 
         Color[] powerupColours =
@@ -68,7 +79,8 @@ namespace Geometry_Invasion
             Color.DarkOliveGreen,
             Color.YellowGreen,
             Color.DeepPink,
-            Color.DarkOrchid
+            Color.DarkOrchid,
+            Color.Cyan
         };
         int[] powerupDuration =
         {
@@ -86,9 +98,10 @@ namespace Geometry_Invasion
             200,
             0,
             200,
-            150
+            150,
+            250
         }; // The duration can mean the amount of time or uses of the powerup, or it is zero if it is an instant powerup.
-        int[] powerupCounters = new int[15];
+        int[] powerupCounters = new int[16];
         Bitmap[] powerupIcons =
         {
             Properties.Resources.health,
@@ -105,7 +118,8 @@ namespace Geometry_Invasion
             Properties.Resources.resistance,
             Properties.Resources.triangle,
             Properties.Resources.spikes,
-            Properties.Resources.poison
+            Properties.Resources.poison,
+            Properties.Resources.phase
         };
         int[] powerupCategories =
         {
@@ -123,8 +137,9 @@ namespace Geometry_Invasion
             0,
             2,
             0,
+            0,
             0
-        }; // The way that the powerup is used. 0 = timer, 1 = usable, 2 = instant
+        }; // The way that the powerup is used. 0 = timer, 1 = at key press, 2 = instant effect
         string[] powerupInfo =
         {
             "Regenerates health gradually. It will deactivate\nif your health bar is full.",
@@ -135,14 +150,14 @@ namespace Geometry_Invasion
             "Use these to capture an enemy\nand have it help you. The indicator below the enemy tells whether they\ncan be switched or not. Requires good aim.",
             "Good for clearing large groups of enemies.",
             "A large, high-health shape that follows you.\nGood at blocking bullets and low level enemies.",
-            "A rare powerup. Use this wisely.\nLarge and indestructable with high damage.",
+            "A rare powerup. Use this wisely.\nLarge with high health and damage.",
             "Allows you to deal damage a little more quickly.",
             "A quick burst of movement that helps you\nescape fast enemies or avoid being surrounded.\nUse the mouse to control the direction of the boost.",
             "Allows you to take no damage from most hits,\nincreasing the chance of surviving high damage enemies.",
             "Summons two shapes with great stats that are\nvery reliable for taking out lower level enemies.",
             "Allows you to deal 8x your base damage.\nYou may want to have healing available, though.",
-            "The bullets you shoot will now have slow but strong\npoison damage in addition to their regular damage.\nBest for taking down high health enemies."
-
+            "The bullets you shoot will now have slow but strong\npoison damage in addition to their regular damage.\nBest for taking down high health enemies.",
+            "Allows you to phase through other non-phasing shapes."
         }; // The text shown at the collection of an undiscovered powerup
         public GameScreen()
         {
@@ -280,7 +295,7 @@ namespace Geometry_Invasion
                     }
                 }
 
-                foreach (Enemy en in enemies)
+                foreach (Enemy en in enemies) // Initialise multi-segmented shapes
                 {
                     if (en.segments > 0)
                     {
@@ -546,9 +561,9 @@ namespace Geometry_Invasion
                                 }
                                 break;
                             case 11:
-                                if (enemies[0].resistance != 7 + powerupStrengths[11])
+                                if (enemies[0].resistance != 3 * (1 + powerupStrengths[11]))
                                 {
-                                    enemies[0].resistance = 7 + powerupStrengths[11];
+                                    enemies[0].resistance = 3 * (1 + powerupStrengths[11]);
                                 }
                                 if (powerupCounters[11] == 0)
                                 {
@@ -563,6 +578,24 @@ namespace Geometry_Invasion
                                 if (powerupCounters[13] == 0)
                                 {
                                     enemies[0].damage = 5;
+                                }
+                                break;
+                            case 15:
+                                if (enemies[0].weight > 0)
+                                {
+                                    enemies[0].weight *= -1;
+                                }
+                                if (enemies[0].resistance < 1 + powerupStrengths[15])
+                                {
+                                    enemies[0].resistance = 1 + powerupStrengths[15];
+                                }
+                                if (powerupCounters[15] == 0)
+                                {
+                                    enemies[0].damage *= -1;
+                                    if (powerupCounters[11] == 0)
+                                    {
+                                        enemies[0].resistance = 0;
+                                    }
                                 }
                                 break;
                         }
@@ -756,6 +789,11 @@ namespace Geometry_Invasion
                                 e.Graphics.DrawImage(crown, Convert.ToInt16(en.x - 10), Convert.ToInt16(en.y - drawSize - 47), 20, 20);
                             }
                         }
+                        SolidBrush healthBrush = new SolidBrush(powerupColours[12]);
+                        if (en.resistance > 0)
+                        {
+                            e.Graphics.FillRectangle(healthBrush, Convert.ToInt16(en.x - 30), Convert.ToInt16(en.y - drawSize - 25), Convert.ToInt16(60 * (1 - (float)en.resistHits / en.resistance)), 3);
+                        }
                         if (en.health < en.maxHealth) // Display health bar
                         {
                             if (en.id == 0)
@@ -769,7 +807,7 @@ namespace Geometry_Invasion
                                     e.Graphics.FillRectangle(greyBrush, Convert.ToInt16(en.x - 30), Convert.ToInt16(en.y - drawSize - 22), 60, 6);
                                 }
                             }
-                            SolidBrush healthBrush = new SolidBrush(Color.Red);
+                            healthBrush.Color = Color.Red;
                             if (en.poisonTaken.Count == 0)
                             {
                                 if (Convert.ToInt16(100 * en.health / en.maxHealth) > 65)
@@ -1004,23 +1042,19 @@ namespace Geometry_Invasion
                             ySpawn = rand1;
                             break;
                     }
-                    spawnList.Add(new Enemy(xSpawn, ySpawn, 7, 0, random.Next(0, 360), 0));
+                    spawnList.Add(new Enemy(xSpawn, ySpawn, 16, 0, random.Next(0, 360), 0));
                     break;
                 case Keys.D1:
-                    powerups.Add(new Powerup(Convert.ToInt16(enemies[0].x), Convert.ToInt16(enemies[0].y), 2, 6));
+                    powerups.Add(new Powerup(Convert.ToInt16(enemies[0].x), Convert.ToInt16(enemies[0].y), 7, 0));
+                    break;
+                case Keys.D2:
+                    powerups.Add(new Powerup(Convert.ToInt16(enemies[0].x), Convert.ToInt16(enemies[0].y), 15, 15));
                     break;
             }
         }
         private void PauseLabel_Click(object sender, EventArgs e)
         {
-            if (pauseGame || gameState == -1)
-            {
-                pauseGame = false;
-            }
-            else
-            {
-                pauseGame = true;
-            }
+            PauseToggle();
         }
         private void button1_Click(object sender, EventArgs e)
         {
@@ -1043,10 +1077,12 @@ namespace Geometry_Invasion
             tick = 0;
             gameState = 2;
             idCounter = 0;
+            pauseGame = false;
             enemies.Clear();
             spawnList.Clear();
             powerups.Clear();
             ResetCounters();
+            currentButtons.Clear();
             AddShape(400, 400, 0, Form1.playerStrength, 0, 1);
             for (int i = 0; i < powerupDuration.Length; i++)
             {
@@ -1145,13 +1181,13 @@ namespace Geometry_Invasion
                         float push = 1;
                         if (en1.weight != en2.weight) // Calculation for weight ratio
                         {
-                            if (en1.weight > en2.weight)
+                            if (Math.Abs(en1.weight) > Math.Abs(en2.weight))
                             {
                                 push = en2.weight / en1.weight;
                             }
                             else
                             {
-                                push = (2 - en1.weight / en2.weight);
+                                push = 2 - en1.weight / en2.weight;
                             }
                         }
                         int bounce = 1;
@@ -1160,10 +1196,11 @@ namespace Geometry_Invasion
                             if (en1.type != 201)
                             {
                                 bounce = 3;
-                                int rand1 = random.Next(1, 11);
-                                int rand2 = random.Next(1, 11);
-                                if (rand1 > en1.resistance)
+                                en1.resistHits++;
+                                en2.resistHits++;
+                                if (en1.resistHits > en1.resistance)
                                 {
+                                    en1.resistHits = 0;
                                     en1.health -= en2.damage;
                                     en1.damageFlash = 2;
                                     if (en2.poisonDamage.duration > 0 && en1.type < 100)
@@ -1171,8 +1208,9 @@ namespace Geometry_Invasion
                                         en1.poisonTaken.Add(en2.poisonDamage);
                                     }
                                 }
-                                if (rand2 > en2.resistance)
+                                if (en2.resistHits > en2.resistance)
                                 {
+                                    en2.resistHits = 0;
                                     en2.health -= en1.damage;
                                     en2.damageFlash = 2;
                                     if (en1.poisonDamage.duration > 0 && en2.type < 100)
@@ -1192,10 +1230,13 @@ namespace Geometry_Invasion
                                 }
                             }
                         }
-                        en1.x += (float)(centreX - distHit * Math.Sin(dirHit * Math.PI / 180) / 2 - en1.x) * push * bounce;
-                        en1.y += (float)(centreY - distHit * Math.Cos(dirHit * Math.PI / 180) / 2 - en1.y) * push * bounce;
-                        en2.x += (float)(centreX + distHit * Math.Sin(dirHit * Math.PI / 180) / 2 - en2.x) * (2 - push) * bounce;
-                        en2.y += (float)(centreY + distHit * Math.Cos(dirHit * Math.PI / 180) / 2 - en2.y) * (2 - push) * bounce;
+                        if (en1.weight * en2.weight > 0)
+                        {
+                            en1.x += (float)(centreX - distHit * Math.Sin(dirHit * Math.PI / 180) / 2 - en1.x) * push * bounce;
+                            en1.y += (float)(centreY - distHit * Math.Cos(dirHit * Math.PI / 180) / 2 - en1.y) * push * bounce;
+                            en2.x += (float)(centreX + distHit * Math.Sin(dirHit * Math.PI / 180) / 2 - en2.x) * (2 - push) * bounce;
+                            en2.y += (float)(centreY + distHit * Math.Cos(dirHit * Math.PI / 180) / 2 - en2.y) * (2 - push) * bounce;
+                        }
                     }
                 }
             }
@@ -1357,7 +1398,7 @@ namespace Geometry_Invasion
             AddListShape(new int[] { 8, 9 }, 7, waveNumber);
             AddListShape(new int[] { 17, 18 }, 8, waveNumber);
             AddListShape(new int[] { 12, 16 }, 9, waveNumber);
-            AddListShape(new int[] { 10, 13 }, 11, waveNumber);
+            AddListShape(new int[] { 10, 13, 19 }, 11, waveNumber);
 
 
             if (wave >= 6)
@@ -1645,6 +1686,28 @@ namespace Geometry_Invasion
             for (int i = 0; i < powerupCounters.Length; i++)
             {
                 powerupCounters[i] = 0;
+            }
+        }
+        void DoButtonFunction(int function)
+        {
+            switch (function)
+            {
+                case 0:
+                    PauseToggle();
+                    break;
+                case 1:
+                    NewGame();
+                    break;
+                case 2:
+                    Form1.ChangeScreen(this, new TitleScreen());
+                    break;
+            }
+        }
+        void PauseToggle()
+        {
+            if (gameState != -1)
+            {
+                pauseGame = !pauseGame;
             }
         }
         void Swap(object[] array) // Swaps two random items in an object array

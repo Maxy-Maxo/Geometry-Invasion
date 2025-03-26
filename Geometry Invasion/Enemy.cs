@@ -24,7 +24,7 @@ namespace Geometry_Invasion
          * 6 = 3 lower lvl shapes
          */
 
-        public int type, strength, resistance, direction, speed, team, size, reload, shots, reloadTimer, id, target, shotBy = -1, homing, targetType, segments = 0, damageFlash = 0;
+        public int type, strength, resistance, resistHits = 0, direction, speed, team, size, reload, shots, reloadTimer, id, target, shotBy = -1, homing, targetType, segments = 0, damageFlash = 0;
         public float x, y, health, maxHealth, damage, weight, scoreValue;
         public bool isBoss = false;
         public Color colour = Color.White;
@@ -155,12 +155,12 @@ namespace Geometry_Invasion
                     shots = 0;
                     break;
                 case 12: // Resistant Octagon
-                    SetStats(Color.Olive, 400, 8, 2, 20, new int[] { 11, 3, 7 }, new int[] { 4, 3, 1 }, new int[] { 1, 2, 4 });
+                    SetStats(Color.Olive, 500, 8, 2, 20, new int[] { 11, 3, 7 }, new int[] { 4, 3, 1 }, new int[] { 1, 2, 4 });
                     design = new Polygon[] { NewPolygon(8, 1) };
                     homing = 1;
                     weight = 0.5f;
                     scoreValue = 1.2f;
-                    resistance = 7;
+                    resistance = 3;
                     break;
                 case 13: // Barrier-Placing Square
                     SetStats(Color.Brown, 800, 7, 3, 30, new int[] { 4, 11, 7 }, new int[] { 4, 2, 1 }, new int[] { 3, 4, 5 });
@@ -181,7 +181,7 @@ namespace Geometry_Invasion
                     weight = 0.1f;
                     break;
                 case 16: // Rare Powerful Decagram
-                    SetStats(Color.White, 3000, 5, 20, 30, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }, new int[] { 1 }, new int[] { 0, 1, 2, 3, 4, 5, 6 });
+                    SetStats(Color.White, 3000, 5, 20, 30, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }, new int[] { 1 }, new int[] { 0, 1, 2, 3, 4, 5, 6 });
                     design = new Polygon[] { NewPolygon(10, 3, 0, 5) };
                     homing = 5;
                     weight = 5;
@@ -201,6 +201,14 @@ namespace Geometry_Invasion
                     reload = 80;
                     shots = 0;
                     break;
+                case 19: // Phasing Hexagram
+                    SetStats(Color.DarkGray, 1000, 6, 2, 25, new int[] { 15, 0 }, new int[] { 2 }, new int[] { 1, 3, 6 });
+                    design = new Polygon[] { NewPolygon(3, 1), NewPolygon(3, 1, 180, 0), NewPolygon(3, 1, 0, 0, 0.8f, Color.Black), NewPolygon(3, 1, 180, 0, 0.8f, Color.Black) };
+                    homing = 3;
+                    weight = -1;
+                    scoreValue = 1.2f;
+                    break;
+
                 // bullets
                 case 100: // Player Circle
                     SetStats(6, 20, 150, 10);
@@ -238,22 +246,22 @@ namespace Geometry_Invasion
                     design = new Polygon[] { NewPolygon(7, 3, 0, 10) };
                     weight = 0;
                     targetType = 2;
-                    resistance = 10;
+                    resistance = 1000;
                     break;
                 case 202: // Shield
-                    SetStats(5000, 4, 4, 75);
+                    SetStats(1000, 4, 4, 75);
                     design = new Polygon[] { NewPolygon(1, 1, 0, 0, 1, Color.FromArgb(50, 50, 60)) };
                     homing = 20;
                     target = 0;
                     weight = 10;
-                    resistance = 7;
+                    resistance = 20;
                     targetType = 2;
                     break;
                 case 203: // Fireball
-                    SetStats(1, 15, 100, 35);
+                    SetStats(2000, 15, 100, 35);
                     design = new Polygon[] { NewPolygon(1, 1, 0, 0, 1, Color.DarkRed) };
-                    weight = 10;
-                    resistance = 10;
+                    weight = -10;
+                    resistance = 3;
                     targetType = 2;
                     break;
             }

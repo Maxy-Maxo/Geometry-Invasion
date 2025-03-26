@@ -20,6 +20,7 @@ namespace Geometry_Invasion
          * 12 = triangle helpers
          * 13 = spikes
          * 14 = poisonous bullets
+         * 15 = phasing
          */
         public int x, y, type, strength, timer;
         public Powerup(int _x, int _y, int _type, int _strength)

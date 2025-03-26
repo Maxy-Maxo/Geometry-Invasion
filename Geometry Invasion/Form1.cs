@@ -11,6 +11,8 @@ namespace Geometry_Invasion
         public static int startingWave = 0;
         public static int playerStrength = 0;
         public static int points = 0;
+        public static string[] data;
+        public static int slot;
         public Form1()
         {
             InitializeComponent();
@@ -26,7 +28,6 @@ namespace Geometry_Invasion
             {
                 f = (Form)sender;
             }
-
             else
             {
                 UserControl current = (UserControl)sender;
@@ -95,26 +96,33 @@ namespace Geometry_Invasion
                     return -1;
             }
         }
-        public static void SaveData()
+        internal static void SaveData()
         {
             FileStream file;
             StreamWriter writer;
             file = File.OpenWrite("..\\..\\Resources\\save.txt");
             writer = new StreamWriter(file);
-            writer.Write($"{startingWave}|{playerStrength}|{points}");
+            data[slot] = $"{startingWave}|{playerStrength}|{points}";
+            for (int i = 0; i < data.Length - 1; i++)
+            {
+                writer.WriteLine(data[i].Trim());
+            }
+            writer.Write(slot);
             writer.Close();
             file.Close();
         }
-        public void RetrieveData()
+        internal void RetrieveData()
         {
             FileStream file;
             StreamReader reader;
             file = File.OpenRead("..\\..\\Resources\\save.txt");
             reader = new StreamReader(file);
-            string str = reader.ReadLine();
+            string str = reader.ReadToEnd();
             if (str != null)
             {
-                string[] saveInfo = str.Split('|');
+                data = str.Split('\n');
+                slot = Convert.ToInt16(data[data.Length - 1]);
+                string[] saveInfo = data[slot].Split('|');
                 startingWave = int.Parse(saveInfo[0]);
                 playerStrength = int.Parse(saveInfo[1]);
                 points = int.Parse(saveInfo[2]);

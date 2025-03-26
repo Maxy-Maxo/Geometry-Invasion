@@ -31,6 +31,7 @@
             this.titleLabel = new System.Windows.Forms.Label();
             this.playButton = new System.Windows.Forms.Button();
             this.exitButton = new System.Windows.Forms.Button();
+            this.upgradesButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // titleLabel
@@ -49,9 +50,9 @@
             this.playButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.playButton.Font = new System.Drawing.Font("VT323", 30F);
             this.playButton.ForeColor = System.Drawing.Color.Black;
-            this.playButton.Location = new System.Drawing.Point(315, 305);
+            this.playButton.Location = new System.Drawing.Point(275, 305);
             this.playButton.Name = "playButton";
-            this.playButton.Size = new System.Drawing.Size(170, 85);
+            this.playButton.Size = new System.Drawing.Size(250, 85);
             this.playButton.TabIndex = 1;
             this.playButton.Text = "PLAY";
             this.playButton.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -64,20 +65,35 @@
             this.exitButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.exitButton.Font = new System.Drawing.Font("VT323", 30F);
             this.exitButton.ForeColor = System.Drawing.Color.Black;
-            this.exitButton.Location = new System.Drawing.Point(315, 405);
+            this.exitButton.Location = new System.Drawing.Point(275, 505);
             this.exitButton.Name = "exitButton";
-            this.exitButton.Size = new System.Drawing.Size(170, 85);
+            this.exitButton.Size = new System.Drawing.Size(250, 85);
             this.exitButton.TabIndex = 2;
             this.exitButton.Text = "EXIT";
             this.exitButton.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.exitButton.UseVisualStyleBackColor = false;
             this.exitButton.Click += new System.EventHandler(this.exitButton_Click);
             // 
+            // upgradesButton
+            // 
+            this.upgradesButton.BackColor = System.Drawing.Color.Yellow;
+            this.upgradesButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.upgradesButton.Font = new System.Drawing.Font("VT323", 30F);
+            this.upgradesButton.ForeColor = System.Drawing.Color.Black;
+            this.upgradesButton.Location = new System.Drawing.Point(275, 405);
+            this.upgradesButton.Name = "upgradesButton";
+            this.upgradesButton.Size = new System.Drawing.Size(250, 85);
+            this.upgradesButton.TabIndex = 3;
+            this.upgradesButton.Text = "UPGRADES";
+            this.upgradesButton.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.upgradesButton.UseVisualStyleBackColor = false;
+            this.upgradesButton.Click += new System.EventHandler(this.upgradesButton_Click);
+            // 
             // TitleScreen
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 38F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.Color.Black;
+            this.Controls.Add(this.upgradesButton);
             this.Controls.Add(this.exitButton);
             this.Controls.Add(this.playButton);
             this.Controls.Add(this.titleLabel);
@@ -95,5 +111,6 @@
         private System.Windows.Forms.Label titleLabel;
         private System.Windows.Forms.Button playButton;
         private System.Windows.Forms.Button exitButton;
+        private System.Windows.Forms.Button upgradesButton;
     }
 }

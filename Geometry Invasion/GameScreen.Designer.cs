@@ -31,8 +31,6 @@
             this.components = new System.ComponentModel.Container();
             this.gameTimer = new System.Windows.Forms.Timer(this.components);
             this.pauseLabel = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // gameTimer
@@ -53,33 +51,11 @@
             this.pauseLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.pauseLabel.Click += new System.EventHandler(this.PauseLabel_Click);
             // 
-            // button1
-            // 
-            this.button1.Font = new System.Drawing.Font("VT323", 30F);
-            this.button1.Location = new System.Drawing.Point(275, 308);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(250, 85);
-            this.button1.TabIndex = 5;
-            this.button1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // button2
-            // 
-            this.button2.Font = new System.Drawing.Font("VT323", 30F);
-            this.button2.Location = new System.Drawing.Point(275, 408);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(250, 85);
-            this.button2.TabIndex = 6;
-            this.button2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
             // GameScreen
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.Color.Black;
             this.Controls.Add(this.pauseLabel);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.button2);
             this.DoubleBuffered = true;
             this.Font = new System.Drawing.Font("VT323", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ForeColor = System.Drawing.Color.White;
@@ -101,7 +77,5 @@
 
         private System.Windows.Forms.Timer gameTimer;
         private System.Windows.Forms.Label pauseLabel;
-        private System.Windows.Forms.Label button1;
-        private System.Windows.Forms.Label button2;
     }
 }

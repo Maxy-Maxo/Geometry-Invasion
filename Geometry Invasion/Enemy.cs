@@ -175,13 +175,13 @@ namespace Geometry_Invasion
                     scoreValue = 1.2f;
                     break;
                 case 15: // Small Laser-Shooting Heptagon
-                    SetStats(Color.LightSkyBlue, 700, 4, 2, 14, new int[] { 1, 5 }, new int[] { 3, 2 }, new int[] { 1, 2, 5 });
+                    SetStats(Color.LightSkyBlue, 700, 4, 2, 14, new int[] { 1, 5, 16 }, new int[] { 3, 2, 1 }, new int[] { 1, 2, 5 });
                     design = new Polygon[] { NewPolygon(7, 1) };
-                    reload = 50;
+                    reload = 25;
                     weight = 0.1f;
                     break;
                 case 16: // Rare Powerful Decagram
-                    SetStats(Color.White, 3000, 5, 20, 30, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }, new int[] { 1 }, new int[] { 0, 1, 2, 3, 4, 5, 6 });
+                    SetStats(Color.White, 3000, 5, 20, 30, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }, new int[] { 1 }, new int[] { 0, 1, 2, 3, 4, 5, 6 });
                     design = new Polygon[] { NewPolygon(10, 3, 0, 5) };
                     homing = 5;
                     weight = 5;
@@ -199,10 +199,11 @@ namespace Geometry_Invasion
                     design = new Polygon[] { NewPolygon(5, 1, 0, 3) };
                     homing = 2;
                     reload = 80;
+                    weight = 0.5f;
                     shots = 0;
                     break;
                 case 19: // Phasing Hexagram
-                    SetStats(Color.DarkGray, 1000, 6, 2, 25, new int[] { 15, 0 }, new int[] { 2 }, new int[] { 1, 3, 6 });
+                    SetStats(Color.DarkGray, 1000, 6, 2, 25, new int[] { 15, 16, 0 }, new int[] { 2, 2, 1 }, new int[] { 1, 3, 6 });
                     design = new Polygon[] { NewPolygon(3, 1), NewPolygon(3, 1, 180, 0), NewPolygon(3, 1, 0, 0, 0.8f, Color.Black), NewPolygon(3, 1, 180, 0, 0.8f, Color.Black) };
                     homing = 3;
                     weight = -1;
@@ -215,11 +216,18 @@ namespace Geometry_Invasion
                     design = new Polygon[] { NewPolygon(1, 1) };
                     target = -2;
                     break;
+                case 101: // Player Circle (phasing)
+                    SetStats(6, 20, 6, 10);
+                    design = new Polygon[] { NewPolygon(1, 1), NewPolygon(1, 1, 0, 0, 0.8f, Color.Black) };
+                    weight = -1;
+                    target = -2;
+                    resistance = 25;
+                    break;
                 case 107: // Small Shooting Pentagram
                     SetStats(1, 25, 40, 7);
                     break;
                 case 110: // Quad-Shooting Octagram
-                    SetStats(80, 7, 3, 10);
+                    SetStats(40, 7, 6, 10);
                     homing = 3;
                     break;
                 case 113: // Barrier-Placing Square
@@ -231,7 +239,7 @@ namespace Geometry_Invasion
                     target = -2;
                     break;
                 case 115: // Small Laser-Shooting Heptagon
-                    SetStats(1, 200, 60, 5);
+                    SetStats(1, 200, 50, 5);
                     design = new Polygon[] { NewPolygon(1, 1) };
                     target = -2;
                     break;
@@ -258,7 +266,7 @@ namespace Geometry_Invasion
                     targetType = 2;
                     break;
                 case 203: // Fireball
-                    SetStats(2000, 15, 100, 35);
+                    SetStats(2000, 12, 100, 35);
                     design = new Polygon[] { NewPolygon(1, 1, 0, 0, 1, Color.DarkRed) };
                     weight = -10;
                     resistance = 3;
@@ -277,7 +285,7 @@ namespace Geometry_Invasion
             {
                 scoreValue = 0;
                 targetType = 1;
-                if (type != 113 && type < 200)
+                if (type != 101 && type != 113 && type < 200)
                 {
                     weight = 0;
                 }

@@ -40,7 +40,7 @@ namespace Geometry_Invasion
             f.Controls.Add(next);
             next.Focus();
         }
-        public static void FillShape(int sides, int level, int x, int y, int size, int rotation, Color colour, PaintEventArgs e)
+        public static void FillShape(int sides, int level, float x, float y, float size, int rotation, Color colour, PaintEventArgs e)
         {
             SolidBrush brush = new SolidBrush(colour);
             if (sides > 2) // Less than 3 sides makes a circle
@@ -59,6 +59,27 @@ namespace Geometry_Invasion
             else
             {
                 e.Graphics.FillEllipse(brush, x - size, y - size, size * 2, size * 2);
+            }
+        }
+        public static void DrawShape(int sides, int level, float x, float y, float size, int rotation, Color colour, int thickness, PaintEventArgs e)
+        {
+            Pen pen = new Pen(colour, thickness);
+            if (sides > 2) // Less than 3 sides makes a circle
+            {
+                double counter = rotation;
+
+                List<Point> vertices = new List<Point>();
+                for (int i = 0; i < sides; i++)
+                {
+                    vertices.Add(new Point(Convert.ToInt16(Math.Round(x + size * Math.Sin(counter * Math.PI / 180))), Convert.ToInt16(Math.Round(y + size * Math.Cos(counter * Math.PI / 180)))));
+                    counter += 3600 * level / sides / 10;
+                }
+                Point[] points = vertices.ToArray();
+                e.Graphics.DrawPolygon(pen, points);
+            }
+            else
+            {
+                e.Graphics.DrawEllipse(pen, x - size, y - size, size * 2, size * 2);
             }
         }
         public static float GetDirection(double x, double y)

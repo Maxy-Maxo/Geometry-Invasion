@@ -157,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="GeoXML.xml" />
+    <None Include="Resources\bullet phase.png" />
     <None Include="Resources\phase.png" />
     <None Include="Resources\save.txt" />
     <None Include="Resources\boss.png" />

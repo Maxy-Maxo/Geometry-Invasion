@@ -83,6 +83,16 @@ namespace Geometry_Invasion.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap bullet_phase {
+            get {
+                object obj = ResourceManager.GetObject("bullet_phase", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap fireball {
             get {
                 object obj = ResourceManager.GetObject("fireball", resourceCulture);
@@ -171,7 +181,7 @@ namespace Geometry_Invasion.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 6|0|2934
+        ///   Looks up a localized string similar to 6|0|427
         ///0|0|0
         ///0|0|0
         ///0|0|0

@@ -69,12 +69,14 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Functions.cs" />
     <Compile Include="GameScreen.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="GameScreen.Designer.cs">
       <DependentUpon>GameScreen.cs</DependentUpon>
     </Compile>
+    <Compile Include="Particle.cs" />
     <Compile Include="Powerup.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -157,6 +159,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="GeoXML.xml" />
+    <None Include="Resources\explosion.png" />
+    <None Include="Resources\mystery.png" />
     <None Include="Resources\bullet phase.png" />
     <None Include="Resources\phase.png" />
     <None Include="Resources\save.txt" />

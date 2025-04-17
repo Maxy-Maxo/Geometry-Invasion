@@ -127,6 +127,9 @@
   <data name="bullet_phase" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\bullet phase.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="explosion" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\explosion.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="fireball" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\fireball.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -141,6 +144,9 @@
   </data>
   <data name="multi" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\multi.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="mystery" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\mystery.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="phase" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\phase.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

@@ -82,6 +82,41 @@ namespace Geometry_Invasion
                 e.Graphics.DrawEllipse(pen, x - size, y - size, size * 2, size * 2);
             }
         }
+        public static float GetDirection(double x, double y)
+        {
+            float direction;
+
+            if (y == 0)
+            {
+                if (x < 0)
+                {
+                    direction = 270;
+                }
+                else
+                {
+                    direction = 90;
+                }
+            }
+            else
+            {
+                direction = (float)(Math.Atan2(x, y) * 180 / Math.PI);
+            }
+            return (direction + 360) % 360;
+        }
+        public static int Flip(double direction, string axis)
+        {
+            float x = (float)Math.Sin(direction * Math.PI / 180);
+            float y = (float)Math.Cos(direction * Math.PI / 180);
+            switch (axis)
+            {
+                case "x":
+                    return (int)Math.Round(GetDirection(x, y * -1));
+                case "y":
+                    return (int)Math.Round(GetDirection(x * -1, y));
+                default:
+                    return -1;
+            }
+        }
         internal static void SaveData()
         {
             FileStream file;

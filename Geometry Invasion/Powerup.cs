@@ -22,9 +22,8 @@ namespace Geometry_Invasion
          * 14 = poisonous bullets
          * 15 = phasing
          * 16 = phasing bullets
-         * 17 = bullet explosion
          */
-        public int x, y, type, strength, timer, rand;
+        public int x, y, type, strength, timer;
         public Powerup(int _x, int _y, int _type, int _strength)
         {
             x = _x;

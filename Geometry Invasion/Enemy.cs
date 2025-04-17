@@ -96,7 +96,7 @@ namespace Geometry_Invasion
                     weight = 0.5f;
                     break;
                 case 3: // Heavy Pentagon
-                    SetStats(Color.Purple, 2000, 4, 7, 35, new int[] { 0, 2, 7 }, new int[] { 6, 4, 2 }, new int[] { 0, 1, 2, 4 });
+                    SetStats(Color.Purple, 2000, 4, 7, 27, new int[] { 0, 2, 7 }, new int[] { 6, 4, 2 }, new int[] { 0, 1, 2, 4 });
                     design = new Polygon[] { NewPolygon(5, 1) };
                     homing = 1;
                     scoreValue = 2;
@@ -109,7 +109,7 @@ namespace Geometry_Invasion
                     scoreValue = 1.2f;
                     break;
                 case 5: // Splitting Hexagram
-                    SetStats(Color.OrangeRed, 1500, 6, 10, 27, new int[] { 2, 1, 12, 17 }, new int[] { 5, 3, 3, 2 }, new int[] { 0, 3, 4 });
+                    SetStats(Color.OrangeRed, 1500, 6, 10, 27, new int[] { 2, 1, 12, 0 }, new int[] { 5, 3, 3, 2 }, new int[] { 0, 3, 4 });
                     design = new Polygon[] { NewPolygon(3, 1), NewPolygon(3, 1, 180, 0) };
                     homing = 2;
                     scoreValue = 1.8f;
@@ -126,7 +126,7 @@ namespace Geometry_Invasion
                     reload = 30;
                     weight = 0.1f;
                     break;
-                case 8: // Chained Hexagons
+                case 8: // Centipede Hexagons
                     SetStats(Color.DarkCyan, 600, 6, 5, 25, new int[] { 0, 4 }, new int[] { 1 }, new int[] { 3 });
                     design = new Polygon[] { NewPolygon(6, 1), NewPolygon(1, 1, 0, 0, 0.5f, Color.Black) };
                     homing = 3;
@@ -140,7 +140,7 @@ namespace Geometry_Invasion
                     scoreValue = 0.8f;
                     break;
                 case 10: // Quad-Shooting Octagram
-                    SetStats(Color.Magenta, 800, 4, 6, 26, new int[] { 6, 1, 17 }, new int[] { 5, 4, 3 }, new int[] { 2, 3, 5 });
+                    SetStats(Color.Magenta, 800, 4, 6, 26, new int[] { 6, 1, 9 }, new int[] { 5, 4, 1 }, new int[] { 2, 3, 5 });
                     design = new Polygon[] { NewPolygon(8, 3) };
                     reload = 120;
                     shots = 4;
@@ -181,7 +181,7 @@ namespace Geometry_Invasion
                     weight = 0.1f;
                     break;
                 case 16: // Rare Powerful Decagram
-                    SetStats(Color.White, 3000, 5, 20, 30, new int[] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }, new int[] { 1 }, new int[] { 0, 1, 2, 3, 4, 5, 6 });
+                    SetStats(Color.White, 3000, 5, 20, 30, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }, new int[] { 1 }, new int[] { 0, 1, 2, 3, 4, 5, 6 });
                     design = new Polygon[] { NewPolygon(10, 3, 0, 5) };
                     homing = 5;
                     weight = 5;
@@ -195,7 +195,7 @@ namespace Geometry_Invasion
                     poisonDamage.duration = 50;
                     break;
                 case 18: // Teleporting Pentagon
-                    SetStats(Color.Navy, 500, 9, 5, 20, new int[] { 3, 10, 0 }, new int[] { 2, 2, 1 }, new int[] { 1, 2, 6 });
+                    SetStats(Color.Navy, 500, 9, 5, 20, new int[] { 3, 10 }, new int[] { 2 }, new int[] { 1, 2, 6 });
                     design = new Polygon[] { NewPolygon(5, 1, 0, 3) };
                     homing = 2;
                     reload = 80;
@@ -208,13 +208,6 @@ namespace Geometry_Invasion
                     homing = 3;
                     weight = -1;
                     scoreValue = 1.2f;
-                    break;
-                case 20: // Small Chained Hexagons
-                    SetStats(Color.Pink, 100, 12, 0.8f, 14, new int[] { 1 }, new int[] { 1 }, new int[] { 3 });
-                    design = new Polygon[] { NewPolygon(6, 1) };
-                    homing = 4;
-                    weight = 0.1f;
-                    scoreValue = 0.2f;
                     break;
 
                 // bullets
@@ -264,8 +257,8 @@ namespace Geometry_Invasion
                     resistance = 1000;
                     break;
                 case 202: // Shield
-                    SetStats(Color.FromArgb(50, 50, 60), 1000, 4, 4, 75);
-                    design = new Polygon[] { NewPolygon(1, 1, 0, 0, 1, colour) };
+                    SetStats(1000, 4, 4, 75);
+                    design = new Polygon[] { NewPolygon(1, 1, 0, 0, 1, Color.FromArgb(50, 50, 60)) };
                     homing = 20;
                     target = 0;
                     weight = 10;
@@ -302,7 +295,7 @@ namespace Geometry_Invasion
                 }
             }
         }
-        public void SetStats(Color _colour, int _health, int _speed, float _damage, int _size, int[] _drops, int[] _droprates)
+        public void SetStats(Color _colour, int _health, int _speed, int _damage, int _size, int[] _drops, int[] _droprates)
         {
             colour = _colour;
             maxHealth = _health;
@@ -312,7 +305,7 @@ namespace Geometry_Invasion
             drops = _drops;
             droprates = _droprates;
         }
-        public void SetStats(Color _colour, int _health, int _speed, float _damage, int _size, int[] _drops, int[] _droprates, int[] _bossAttacks)
+        public void SetStats(Color _colour, int _health, int _speed, int _damage, int _size, int[] _drops, int[] _droprates, int[] _bossAttacks)
         {
             colour = _colour;
             maxHealth = _health;
@@ -323,7 +316,7 @@ namespace Geometry_Invasion
             droprates = _droprates;
             bossAttacks = _bossAttacks;
         }
-        public void SetStats(Color _colour, int _health, int _speed, float _damage, int _size)
+        public void SetStats(Color _colour, int _health, int _speed, int _damage, int _size)
         {
             colour = _colour;
             maxHealth = _health;
@@ -331,7 +324,7 @@ namespace Geometry_Invasion
             damage = _damage;
             size = _size;
         }
-        public void SetStats(int _health, int _speed, float _damage, int _size)
+        public void SetStats(int _health, int _speed, int _damage, int _size)
         {
             maxHealth = _health;
             speed = _speed;
